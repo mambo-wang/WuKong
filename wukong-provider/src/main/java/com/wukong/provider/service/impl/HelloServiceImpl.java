@@ -28,7 +28,8 @@ public class HelloServiceImpl implements HelloService {
     private UserVO convert(User user){
         UserVO userVO = new UserVO();
         BeanUtils.copyProperties(user, userVO, "password");
-        userVO.setName(sm.getString("common.test"));
+        userVO.setName("测试");
+        userVO.setUsername("测试数据");
         return userVO;
     }
 }

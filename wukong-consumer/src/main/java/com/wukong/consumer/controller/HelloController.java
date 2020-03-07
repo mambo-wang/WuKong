@@ -52,7 +52,7 @@ public class HelloController {
         helloSender.send();
         neoSender.send(1);
         neoSender2.send(2);
-        //todo 发送的中文乱码
+        //todo 用stringManager发送的中文乱码
         objectSender.send(helloService.sayHello("ououou"));
         topicSender.send();
         topicSender.send1();
