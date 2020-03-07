@@ -1,18 +1,29 @@
 package com.wukong.provider.config.interceptor;
 
+import com.alibaba.fastjson.JSON;
+import com.wukong.common.exception.BusinessException;
+import com.wukong.common.exception.CommonErrorCode;
+import com.wukong.provider.config.redis.RedisConfig;
+import com.wukong.provider.entity.User;
+import com.wukong.provider.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.*;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-
-import javax.annotation.Resource;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 /**
  * aop采集日志(接口请求参数，接口调用时间)
@@ -22,11 +33,14 @@ import java.util.Objects;
  */
 @Aspect
 @Component
+@Slf4j
 public class RestEasyAop {
 
+    @Autowired
+    UserService userService;
 
-    @Resource
-    private OperationLogService operationLogService;
+    @Autowired
+    StringRedisTemplate stringRedisTemplate;
 
     private static String[] types = {"java.lang.Integer", "java.lang.Double",
             "java.lang.Float", "java.lang.Long", "java.lang.Short",
@@ -34,97 +48,100 @@ public class RestEasyAop {
             "java.lang.String", "int", "double", "long", "short", "byte",
             "boolean", "char", "float"};
 
-    private static final HikGaLogger log = HikGaLoggerFactory.getLogger(RestEasyAop.class);
-
-    public static ThreadLocal<String> usernameThreadLocal = new ThreadLocal<>();
-    public static ThreadLocal<String> imeiThreadLocal = new ThreadLocal<>();
-    public static ThreadLocal<String> ipThreadLocal = new ThreadLocal<>();
-
-    /**
-     * 拦截所有手机app访问的接口
-     */
-    @Pointcut("execution(* com.hikvision.pbg.jc.common.modules.resteasy.rs.*.*(..)) ")
-    public void restEasyMethodPointcut() {
-    }
-
     /**
      * 拦截所有web端访问的controller方法
      */
-    @Pointcut("execution(* com.hikvision.pbg.jc.common.modules.controller.*.*(..)) ")
+    @Pointcut("execution(* com.wukong.provider.controller.*.*(..)) ")
     public void controllerMethodPointcut() {
+
     }
-
-
-    @Pointcut("restEasyMethodPointcut() || controllerMethodPointcut()")
-    private void methodPointcut(){}
-
 
     /**
      * 拦截所有带RestEasyLog注解的方法，记录成功或失败日志
      */
-    @Pointcut("@annotation(com.hikvision.pbg.jc.common.modules.common.interceptor.RestEasyLog)")
-    public void logAnnotation(){
+    @Pointcut("@annotation(com.wukong.provider.config.interceptor.AccessLimit)")
+    public void accessAnno(){
 
     }
 
-    @AfterReturning("logAnnotation()")
-    public void doBefore(JoinPoint point) {
+    @Before("accessAnno()")
+    public void doBefore(JoinPoint point) throws Exception {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        String username = request.getHeader("Username");
-        if(StringUtils.isEmpty(username)){
-            username = "system";
-        }
-        Signature signature = point.getSignature();//此处joinPoint的实现类是MethodInvocationProceedingJoinPoint
+        HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
+        User user = getUser(request, response);
 
-        MethodSignature methodSignature = (MethodSignature) signature;//获取参数名
-        RestEasyLog restEasyLogAnno = methodSignature.getMethod().getAnnotation(RestEasyLog.class);
-
-        String desc = restEasyLogAnno.description() + getMethodInfo(point);
-        Integer category = restEasyLogAnno.category();
-        log.info("--------------add success log-----------");
-        operationLogService.addSuccessLog(username, category, desc);
-    }
-
-    @AfterThrowing(pointcut = "logAnnotation()", throwing= "error")
-    public void afterThrowingAdvice(JoinPoint point, Throwable error){
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        String username = request.getHeader("Username");
-        if(StringUtils.isEmpty(username)){
-            username = "system";
-        }
         Signature signature = point.getSignature();//此处joinPoint的实现类是MethodInvocationProceedingJoinPoint
         MethodSignature methodSignature = (MethodSignature) signature;//获取参数名
-        RestEasyLog restEasyLogAnno = methodSignature.getMethod().getAnnotation(RestEasyLog.class);
+        AccessLimit accessLimit = methodSignature.getMethod().getAnnotation(AccessLimit.class);
 
-        String desc = restEasyLogAnno.description() + getMethodInfo(point);
-        Integer category = restEasyLogAnno.category();
-        log.info("--------------add fail log-----------");
-        operationLogService.addFailureLog(username, category, desc, error.getMessage());
+        if(accessLimit == null) {
+            throw new BusinessException(CommonErrorCode.ACCESS_LIMIT_REACHED.getCode(), CommonErrorCode.ACCESS_LIMIT_REACHED.getMsg());
+        }
+        int seconds = accessLimit.seconds();
+        int maxCount = accessLimit.maxCount();
+        boolean needLogin = accessLimit.needLogin();
+        String key = request.getRequestURI();
+        if(needLogin) {
+            if(user == null) {
+                render(response, CommonErrorCode.SESSION_ERROR);
+            }
+            key += "_" + user.getUsername();
+        }else {
+            //do nothing
+        }
+        String count = stringRedisTemplate.opsForValue().get(RedisConfig.REDIS_KEY_ACCESS + key);
+        if(count  == null) {
+            stringRedisTemplate.opsForValue().increment(RedisConfig.REDIS_KEY_ACCESS+ key, 1);
+
+            stringRedisTemplate.expire(RedisConfig.REDIS_KEY_ACCESS+ key, seconds, TimeUnit.SECONDS);
+        }else if(Integer.valueOf(count) < maxCount) {
+            stringRedisTemplate.opsForValue().increment(RedisConfig.REDIS_KEY_ACCESS+ key, 1);
+        }else {
+//            render(response, CommonErrorCode.ACCESS_LIMIT_REACHED);
+            throw new BusinessException(CommonErrorCode.ACCESS_LIMIT_REACHED.getCode(), CommonErrorCode.ACCESS_LIMIT_REACHED.getMsg());
+        }
     }
 
 
-    @AfterThrowing(pointcut = "restEasyMethodPointcut()", throwing= "error")
+    @AfterThrowing(pointcut = "controllerMethodPointcut()", throwing= "error")
     public void controller(JoinPoint point, Throwable error) {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         String info = String.format("\n =======> request uri: %s  %s", request.getRequestURI(), getMethodInfo(point));
         log.error("{}, ====> error msg: {}", info, error.getMessage());
+        //todo 错误日志记录到日志分析系统中
     }
 
-    @Before("methodPointcut()")
-    public void beforeAppReq(JoinPoint point){
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        String username = request.getHeader("Username");
-        if(StringUtils.isNotEmpty(username)){
-            usernameThreadLocal.set(username);
+
+    private void render(HttpServletResponse response, CommonErrorCode cm)throws Exception {
+        response.setContentType("application/json;charset=UTF-8");
+        OutputStream out = response.getOutputStream();
+        String str  = JSON.toJSONString(cm);
+        out.write(str.getBytes("UTF-8"));
+        out.flush();
+        out.close();
+    }
+
+    private User getUser(HttpServletRequest request, HttpServletResponse response) {
+        String paramToken = request.getParameter("token");
+        String cookieToken = getCookieValue(request, "token");
+        if(StringUtils.isEmpty(cookieToken) && StringUtils.isEmpty(paramToken)) {
+            return null;
         }
-        String imei = request.getHeader("imei");
-        if(StringUtils.isNotEmpty(imei)){
-            imeiThreadLocal.set(imei);
+        String token = StringUtils.isEmpty(paramToken)?cookieToken:paramToken;
+        return userService.getByToken(response, token);
+    }
+
+    private String getCookieValue(HttpServletRequest request, String cookiName) {
+        Cookie[]  cookies = request.getCookies();
+        if(cookies == null || cookies.length <= 0){
+            return null;
         }
-        String ip = request.getHeader("X-Real-IP");
-        if(StringUtils.isNotEmpty(ip)){
-            ipThreadLocal.set(ip);
+        for(Cookie cookie : cookies) {
+            if(cookie.getName().equals(cookiName)) {
+                return cookie.getValue();
+            }
         }
+        return null;
     }
 
     private String getMethodInfo(JoinPoint point) {
