@@ -19,6 +19,10 @@ public enum CommonErrorCode {
    */
   FORBIDDEN("403", "Forbidden"),
 
+  SESSION_ERROR ("100_001","Session不存在或者已经失效!"),
+  ACCESS_LIMIT_REACHED ("100_002","请求非法!"),
+
+
   //=======================================认证失败=====================================================================
   //认证相关错误，不知道具体错误时可使用
   AUTHENTICATION_COMMON_ERROR(ErrorCodeBaseConstant.AUTHENTICATION_PREFIX + "00", "authentication error"),
