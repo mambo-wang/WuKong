@@ -4,16 +4,12 @@
 #### 包含组件
 
 - dubbo + zookeeper 服务间远程调用
-
 - redis高性能缓存
-
 - rabbitMQ异步消息队列
-
 - mybatis数据层
-
 - poi表格操作工具（接受过多个生产环境考验）
-
-- aop + redis + 自定义注解 实现接口限流
+- mongoDB作为日志服务器
+- aop + redis + 自定义注解 实现接口限流、日志记录
 #### todo list
 
 -  邮件集成
