@@ -3,11 +3,10 @@ package com.wukong.common.utils;
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.geometry.Positions;
 import org.apache.commons.lang3.StringUtils;
-import sun.misc.BASE64Encoder;
-
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.util.Base64;
 
 public class ThumbnailatorTool {
 
@@ -47,7 +46,6 @@ public class ThumbnailatorTool {
 
     public static String getBase64(String filePath){
         byte[] data = null;
-        BASE64Encoder encoder = new BASE64Encoder();
         try(InputStream inputStream = new FileInputStream(filePath)){
             data = new byte[inputStream.available()];
             inputStream.read(data);
@@ -56,7 +54,7 @@ public class ThumbnailatorTool {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return new String(encoder.encodeBuffer(data));
+        return new String(Base64.getEncoder().encode(data));
     }
 
     /**

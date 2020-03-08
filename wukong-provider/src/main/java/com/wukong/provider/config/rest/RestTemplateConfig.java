@@ -1,4 +1,4 @@
-package com.hikvision.pbg.jc.common.modules.common.rest;
+package com.wukong.provider.config.rest;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

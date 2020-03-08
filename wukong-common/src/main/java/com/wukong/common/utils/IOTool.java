@@ -4,15 +4,12 @@ import com.wukong.common.exception.BusinessException;
 import com.wukong.common.exception.CommonErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import sun.misc.BASE64Encoder;
-
+import org.apache.commons.net.util.Base64;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -83,8 +80,7 @@ public class IOTool {
     }
 
     private static String encode(byte[] image){
-        BASE64Encoder decoder = new BASE64Encoder();
-        return replaceEnter(decoder.encode(image));
+        return replaceEnter(Base64.encodeBase64String(image));
     }
 
     private static String replaceEnter(String str){

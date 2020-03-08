@@ -41,7 +41,6 @@ public class FtpService {
      * 连接服务器
      * @return 连接成功与否 true:成功， false:失败
      */
-    @PostConstruct
     public boolean open() {
         if (ftpClient != null && ftpClient.isConnected()) {
             return true;

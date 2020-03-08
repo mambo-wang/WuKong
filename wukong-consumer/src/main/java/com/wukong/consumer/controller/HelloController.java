@@ -1,6 +1,7 @@
 package com.wukong.consumer.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.wukong.common.dubbo.DubboService;
 import com.wukong.common.model.BaseResult;
 import com.wukong.common.model.UserVO;
 import com.wukong.consumer.rabbit.fanout.FanoutSender;
@@ -11,7 +12,9 @@ import com.wukong.consumer.rabbit.object.ObjectSender;
 import com.wukong.consumer.rabbit.topic.TopicSender;
 import com.wukong.service.HelloService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -19,6 +22,8 @@ public class HelloController {
 
     @Reference
     private HelloService helloService;
+    @Reference
+    private DubboService dubboService;
     @Autowired
     private FanoutSender fanoutSender;
     @Autowired
@@ -38,7 +43,17 @@ public class HelloController {
      */
     @RequestMapping(value = "/hello")
     public BaseResult hello() {
-        UserVO hello = helloService.sayHello("world");
+        UserVO hello = helloService.sayHello("ououou");
+        return BaseResult.success(hello);
+    }
+
+    /**
+     * 测试dubbo
+     * @return
+     */
+    @GetMapping(value = "/user")
+    public BaseResult user(@RequestParam(name = "username")String username) {
+        UserVO hello = dubboService.getUser(username);
         return BaseResult.success(hello);
     }
 
