@@ -1,4 +1,4 @@
-package com.wukong.common.dubbo;
+package com.wukong.service.service;
 
 public interface LogService {
 

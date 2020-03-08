@@ -2,7 +2,6 @@ package com.wukong.consumer.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.wukong.common.dubbo.DubboService;
-import com.wukong.common.dubbo.LogService;
 import com.wukong.common.model.BaseResult;
 import com.wukong.common.model.UserVO;
 import com.wukong.consumer.rabbit.fanout.FanoutSender;
