@@ -10,6 +10,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
 
 public final class DateTimeTool {
 
@@ -30,6 +31,13 @@ public final class DateTimeTool {
         Instant instant = Instant.ofEpochMilli(time);
         LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.of("UTC+08:00"));
         return localDateTime.format(formatter);
+    }
+
+    public static String formatDate(Date date) {
+        if(Objects.isNull(date)){
+            return null;
+        }
+        return  formatDate(date.getTime(), FORMATTER_FULL);
     }
 
     /**
