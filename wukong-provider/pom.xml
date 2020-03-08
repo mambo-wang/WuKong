@@ -31,12 +31,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.wukong</groupId>
-            <artifactId>wukong-dubbo-api</artifactId>
-            <version>1.1</version>
-        </dependency>
-
-        <dependency>
             <artifactId>wukong-common</artifactId>
             <groupId>com.wukong</groupId>
             <version>1.0</version>

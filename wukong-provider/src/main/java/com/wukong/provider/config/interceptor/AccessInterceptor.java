@@ -22,6 +22,9 @@ import java.io.OutputStream;
 import java.util.concurrent.TimeUnit;
 
 
+/**
+ * todo 没走进来
+ */
 @Service
 public class AccessInterceptor  extends HandlerInterceptorAdapter {
 

@@ -3,6 +3,7 @@ package com.wukong.common.model;
 import com.wukong.common.exception.BusinessException;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.ToString;
 
 import java.beans.Transient;
 import java.io.Serializable;
@@ -15,6 +16,7 @@ import java.util.Optional;
  * @param <T> 数据泛型
  */
 @ApiModel(description = "hik-ga-common提供的统一返回格式")
+@ToString
 public class BaseResult<T> implements Serializable {
   private static final long serialVersionUID = 6803323956728517039L;
 

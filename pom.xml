@@ -10,7 +10,7 @@
     <version>1.0</version>
 
     <modules>
-        <module>wukong-dubbo-api</module>
+        <module>wukong-scripture</module>
         <module>wukong-provider</module>
         <module>wukong-consumer</module>
         <module>wukong-common</module>
