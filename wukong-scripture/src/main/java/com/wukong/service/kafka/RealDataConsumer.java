@@ -5,6 +5,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.io.UnsupportedEncodingException;
@@ -18,6 +19,7 @@ import java.util.concurrent.Executors;
  *
  * @author wangbao6
  */
+@Component
 public class RealDataConsumer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RealDataConsumer.class);
