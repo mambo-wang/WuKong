@@ -61,6 +61,7 @@ public class HelloController {
         topicSender.send();
         topicSender.send1();
         topicSender.send2();
+        helloSender.sendDeadLetter("dead letter");
         return BaseResult.success(null);
     }
 

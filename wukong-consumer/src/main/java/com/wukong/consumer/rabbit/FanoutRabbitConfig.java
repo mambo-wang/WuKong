@@ -46,4 +46,6 @@ public class FanoutRabbitConfig {
         return BindingBuilder.bind(CMessage).to(fanoutExchange);
     }
 
+
+
 }
