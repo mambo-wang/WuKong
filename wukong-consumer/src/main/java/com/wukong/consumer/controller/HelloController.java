@@ -51,17 +51,17 @@ public class HelloController {
      * @return
      */
     @RequestMapping(value = "/rmq")
-    public BaseResult rmq() {
+    public BaseResult rmq(@RequestParam(name = "seconds")int seconds, @RequestParam(name = "username") String username) {
         fanoutSender.send();
         helloSender.send();
         neoSender.send(1);
         neoSender2.send(2);
         //todo 用stringManager发送的中文乱码
-        objectSender.send(dubboService.getUser("ououou"));
+        objectSender.send(dubboService.getUser(username));
         topicSender.send();
         topicSender.send1();
         topicSender.send2();
-        helloSender.sendDeadLetter("dead letter");
+        helloSender.sendDeadLetter("dead letter", seconds);
         return BaseResult.success(null);
     }
 

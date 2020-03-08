@@ -22,9 +22,9 @@ import java.util.Map;
 public class DelayConfig {
 
 
-    public static final String EXCHANGE_DELAY="exchange.delay.new";
-    public static final String QUEUE_DELAY = "queue.delay.new";
-    public static final String ROUTINGKEY_DELAY = "routing.delay.new";
+    public static final String EXCHANGE_DELAY="exchange.delay.wukong";
+    public static final String QUEUE_DELAY = "queue.delay.wukong";
+    public static final String ROUTINGKEY_DELAY = "routing.delay.wukong";
 
 
 
@@ -34,8 +34,7 @@ public class DelayConfig {
         Map<String, Object> params = new HashMap<>();
         params.put("x-dead-letter-exchange", "topicExchange");
         params.put("x-dead-letter-routing-key", "topic.message");
-        params.put("x-message-ttl", 5000);
-        return new Queue(QUEUE_DELAY, true, false, false, params);
+        return new Queue(QUEUE_DELAY, true, false, true, params);
 
     }
 

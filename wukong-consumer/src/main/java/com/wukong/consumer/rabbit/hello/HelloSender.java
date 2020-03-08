@@ -25,12 +25,12 @@ public class HelloSender {
 
 	/**
 	 * 延迟消息
-	 * @param coffee
+	 * @param content
 	 */
-	public void sendDeadLetter(String coffee){
-		this.rabbitTemplate.convertAndSend(DelayConfig.EXCHANGE_DELAY, DelayConfig.ROUTINGKEY_DELAY, coffee, message -> {
+	public void sendDeadLetter(String content, int seconds){
+		this.rabbitTemplate.convertAndSend(DelayConfig.EXCHANGE_DELAY, DelayConfig.ROUTINGKEY_DELAY, content, message -> {
 			message.getMessageProperties().setHeader(AbstractJavaTypeMapper.DEFAULT_CONTENT_CLASSID_FIELD_NAME, String.class.getName());
-			message.getMessageProperties().setExpiration(10 * 1000 + "");
+			message.getMessageProperties().setExpiration(seconds * 1000 + "");
 			return message;
 		});
 		log.info("延迟消息发送时间：{}", LocalDateTime.now());
