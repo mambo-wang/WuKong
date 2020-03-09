@@ -83,10 +83,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
-        <!--kafka-->
+        <!--kafka 请尽量保持服务器端版本和客户端版本一致，否则你将损失很多 Kafka 为你提供的性能优化收益-->
         <dependency>
             <groupId>org.springframework.kafka</groupId>
             <artifactId>spring-kafka</artifactId>
+            <version>2.2.7.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.kafka</groupId>

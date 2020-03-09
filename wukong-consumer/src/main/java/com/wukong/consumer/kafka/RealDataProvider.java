@@ -1,13 +1,9 @@
 package com.wukong.consumer.kafka;
 
 import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerRecord;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
-import java.text.SimpleDateFormat;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import java.util.Properties;
 
 /**
@@ -15,34 +11,27 @@ import java.util.Properties;
  *
  * @author wangbao6
  */
-@Component
+@Configuration
 public class RealDataProvider {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RealDataProvider.class);
-    private KafkaProducer<String, String> producer;
-    private String charsetName = "UTF-8";
-    private SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+    @Value("${spring.kafka.bootstrap-servers}")
+    private String bootstrapServers;
 
-    public void init() {
+    @Bean
+    public KafkaProducer<String, String> kafkaProducer() {
         Properties props = new Properties();
         /**必须的配置， 代表该消费者所属的 consumer group*/
-        props.put("bootstrap.servers", "121.43.191.104:9093");
+        props.put("bootstrap.servers", bootstrapServers);
         props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-        producer = new KafkaProducer<String, String>(props);
-        charsetName = "UTF-8";
-    }
-
-
-    @PostConstruct
-    public void start() {
-        init();;
-        producer.send(new ProducerRecord<>("tttopic", "lfsjadlfjsdlajfldsajfldsf"));
-    }
-
-    public void send(String content){
-        producer.send(new ProducerRecord<>("tttopic", content));
-
+//        props.put("client.id", "ctm-producer-client-id-1");
+        // 0：这意味着生产者producer不等待来自broker同步完成的确认继续发送下一条（批）消息。此选项提供最低的延迟但最弱的耐久性保证（当服务器发生故障时某些数据会丢失，如leader已死，但producer并不知情，发出去的信息broker就收不到）。
+        // 1：这意味着producer在leader已成功收到的数据并得到确认后发送下一条message。此选项提供了更好的耐久性为客户等待服务器确认请求成功（被写入死亡leader但尚未复制将失去了唯一的消息）。
+        // -1：这意味着producer在follower副本确认接收到数据后才算一次发送完成。
+        // 此选项提供最好的耐久性，我们保证没有信息将丢失，只要至少一个同步副本保持存活。
+        props.put("request.required.acks", "0");
+        KafkaProducer<String, String> producer = new KafkaProducer<String, String>(props);
+        return producer;
     }
 
 }
