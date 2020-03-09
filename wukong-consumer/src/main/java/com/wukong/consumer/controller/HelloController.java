@@ -34,7 +34,6 @@ public class HelloController {
     @Autowired
     private TopicSender topicSender;
 
-
     /**
      * 测试dubbo
      * @return

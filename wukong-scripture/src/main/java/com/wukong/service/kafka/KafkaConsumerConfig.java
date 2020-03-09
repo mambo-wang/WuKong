@@ -26,9 +26,6 @@ import java.util.concurrent.Executors;
 @EnableConfigurationProperties(KafkaConsumerProperties.class)
 public class KafkaConsumerConfig {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(KafkaConsumerConfig.class);
-    private String charsetName = "UTF-8";
-
     @Autowired
     private KafkaConsumerProperties kafkaConsumerProperties;
 
@@ -47,48 +44,6 @@ public class KafkaConsumerConfig {
         props.put("key.deserializer", kafkaConsumerProperties.getKeyDeserializer());
         props.put("value.deserializer", kafkaConsumerProperties.getValueDeserializer());
         KafkaConsumer<String, String> consumer = new KafkaConsumer<String, String>(props);
-        consumer.subscribe(Arrays.asList("wukong"));
-        start(consumer);
         return consumer;
-    }
-
-
-    public void start(KafkaConsumer consumer) {
-
-        Executors.newSingleThreadExecutor().submit(() -> {
-            // 鉴权认证
-            LOGGER.info("----------------begin receive data------------------------");
-            try {
-                while (true) {
-                    ConsumerRecords records = consumer.poll(Duration.ofSeconds(2));
-                    process(records);
-                    consumer.commitAsync();
-                }
-            } catch (Throwable e) {
-                LOGGER.error("consumer exception", e);
-            } finally {
-                try {
-                    consumer.commitSync();
-                } finally {
-                    consumer.close();
-                }
-            }
-        });
-
-    }
-
-
-    private void process(ConsumerRecords<String, String> records) {
-        try {
-            for (ConsumerRecord<String, String> record : records) {
-                // 1.获取kafkajsong数据
-                String message = new String(record.value().getBytes(), charsetName);
-
-                LOGGER.info("receive a message: {}", message);
-
-            }
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
     }
 }

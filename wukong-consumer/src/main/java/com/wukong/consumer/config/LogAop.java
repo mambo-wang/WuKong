@@ -1,6 +1,9 @@
 package com.wukong.consumer.config;
 
+import com.wukong.common.model.OperationLogVO;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +27,9 @@ public class LogAop {
     @Autowired
     private KafkaTemplate<String,String> kafkaTemplate;
 
+    @Autowired
+    private KafkaProducer<String, String> kafkaProducer;
+
     /**
      * 拦截所有web端访问的controller方法
      */
@@ -38,14 +44,18 @@ public class LogAop {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         String info = String.format("\n =======> request uri: %s", request.getRequestURI());
         log.error("{}, ====> error msg: {}", info, error.getMessage());
-//        logService.addFailureLog(OperationLog.MODULE_CONSUMER, request.getRequestURI() + " " + point.getSignature().toString(), error.toString(), "system");
+        String log = OperationLogVO.failure(OperationLogVO.MODULE_CONSUMER, request.getRequestURI() + " " + point.getSignature().toString(), error.toString(), "system");
+        ProducerRecord<String, String> record = new ProducerRecord<>("wukong", log);
+        kafkaProducer.send(record);
     }
 
     @AfterReturning(pointcut="controllerMethodPointcut()", returning="retVal")
     public void afterReturningAdvice(JoinPoint jp, Object retVal){
         System.out.println("[afterReturningAdvice] Method Signature: "  + jp.getSignature());
         System.out.println("[afterReturningAdvice] Returning: " + retVal.toString() );
-//        logService.addSuccessLog(OperationLog.MODULE_CONSUMER, jp.getSignature().toString(), retVal.toString(),"admin");
+        String log = OperationLogVO.success(OperationLogVO.MODULE_CONSUMER, jp.getSignature().toString(), retVal.toString(),"admin");
+        ProducerRecord<String, String> record = new ProducerRecord<>("wukong", log);
+        kafkaProducer.send(record);
     }
 
 

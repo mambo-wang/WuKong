@@ -1,8 +1,8 @@
 package com.wukong.service.controller;
 
 import com.wukong.common.model.BaseResult;
-import com.wukong.common.model.OperationLog;
 import com.wukong.service.repository.LogRepository;
+import com.wukong.service.repository.entity.OperationLog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

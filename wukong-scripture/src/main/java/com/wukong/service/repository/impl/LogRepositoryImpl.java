@@ -1,7 +1,9 @@
 package com.wukong.service.repository.impl;
 
-import com.wukong.common.model.OperationLog;
+import com.wukong.common.model.OperationLogVO;
 import com.wukong.service.repository.LogRepository;
+import com.wukong.service.repository.entity.OperationLog;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -16,6 +18,7 @@ import java.util.List;
  * Created by summer on 2017/5/5.
  */
 @Component
+@Slf4j
 public class LogRepositoryImpl implements LogRepository {
 
     @Autowired
@@ -23,24 +26,25 @@ public class LogRepositoryImpl implements LogRepository {
 
     /**
      * 创建对象
-     * @param log
+     * @param operationLog
      */
     @Override
-    public void saveLog(OperationLog log) {
-        mongoTemplate.save(log);
+    public void saveLog(OperationLog operationLog) {
+        mongoTemplate.save(operationLog);
+        log.info("success save a log {}", operationLog);
     }
 
     @Override
-    public List<OperationLog> findLogs(OperationLog log) {
+    public List<OperationLog> findLogs(OperationLog operationLog) {
         Query query=new Query(Criteria.where("deleted").is("n"));
-        if(StringUtils.isNotEmpty(log.getDesc())){
-            query.addCriteria(Criteria.where("desc").is(log.getDesc()));
-        } else if(StringUtils.isNotEmpty(log.getResult())){
-            query.addCriteria(Criteria.where("result").is(log.getResult()));
-        } else if(StringUtils.isNotEmpty(log.getModule())){
-            query.addCriteria(Criteria.where("module").is(log.getModule()));
-        } else if(StringUtils.isNotEmpty(log.getTime())){
-            query.addCriteria(Criteria.where("time").gt(log.getTime()));
+        if(StringUtils.isNotEmpty(operationLog.getDesc())){
+            query.addCriteria(Criteria.where("desc").is(operationLog.getDesc()));
+        } else if(StringUtils.isNotEmpty(operationLog.getResult())){
+            query.addCriteria(Criteria.where("result").is(operationLog.getResult()));
+        } else if(StringUtils.isNotEmpty(operationLog.getModule())){
+            query.addCriteria(Criteria.where("module").is(operationLog.getModule()));
+        } else if(StringUtils.isNotEmpty(operationLog.getTime())){
+            query.addCriteria(Criteria.where("time").gt(operationLog.getTime()));
         }
         List<OperationLog> operationLogs =  mongoTemplate.find(query , OperationLog.class);
         return operationLogs;
@@ -50,13 +54,13 @@ public class LogRepositoryImpl implements LogRepository {
     public long deleteLogBeforeTime(String time, boolean persistent) {
         Query query=new Query(Criteria.where("time").lt(time));
         if(persistent){
-            return mongoTemplate.remove(query, OperationLog.class).getDeletedCount();
+            return mongoTemplate.remove(query, OperationLogVO.class).getDeletedCount();
         } else {
             Update update= new Update().set("deleted", "y");
             //更新查询返回结果集的第一条
-//            UpdateResult result =mongoTemplate.updateFirst(query,update,OperationLog.class);
+//            UpdateResult result =mongoTemplate.updateFirst(query,update,OperationLogVO.class);
             //更新查询返回结果集的所有
-             return mongoTemplate.updateMulti(query,update,OperationLog.class).getMatchedCount();
+             return mongoTemplate.updateMulti(query,update, OperationLogVO.class).getMatchedCount();
         }
     }
 
