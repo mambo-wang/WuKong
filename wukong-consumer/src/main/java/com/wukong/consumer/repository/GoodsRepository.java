@@ -1,6 +1,7 @@
 package com.wukong.consumer.repository;
 
 import com.wukong.consumer.repository.entity.Goods;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -8,9 +9,10 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
-public interface GoodsRepository extends PagingAndSortingRepository<Goods, Long>, JpaSpecificationExecutor<Goods> {
+public interface GoodsRepository extends PagingAndSortingRepository<Goods, Long>, JpaSpecificationExecutor<Goods> , JpaRepository<Goods, Long> {
 
 
     @Modifying
@@ -18,4 +20,6 @@ public interface GoodsRepository extends PagingAndSortingRepository<Goods, Long>
     int reduceStock(Long goodsId);
 
     List<Goods> findByDeleted(String deleted);
+
+    Optional<Goods> findById(Long id);
 }

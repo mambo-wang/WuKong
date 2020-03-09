@@ -90,6 +90,8 @@ public class GoodsServiceImpl implements GoodsService, InitializingBean {
         if(num == 0){
             throw new BusinessException("5555","无库存");
         }
+        Goods goods = goodsRepository.findById(goodsId).get();
+        redisTemplate.opsForHash().put(Constant.RedisKey.KEY_GOODS, goods.getId().toString(), JSONObject.toJSONString(goods));
     }
 
     private List<GoodsVO> convert(List<Goods> goods){
