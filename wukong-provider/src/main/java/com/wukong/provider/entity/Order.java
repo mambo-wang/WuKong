@@ -10,15 +10,13 @@ public class Order {
 
     private Long goodsId;
 
-    private Long deliveryAddrId;
+    private String address;
 
     private String goodsName;
 
     private Integer goodsCount;
 
     private BigDecimal goodsPrice;
-
-    private Integer orderChannel;
 
     private Integer status;
 
@@ -50,12 +48,12 @@ public class Order {
         this.goodsId = goodsId;
     }
 
-    public Long getDeliveryAddrId() {
-        return deliveryAddrId;
+    public String getAddress() {
+        return address;
     }
 
-    public void setDeliveryAddrId(Long deliveryAddrId) {
-        this.deliveryAddrId = deliveryAddrId;
+    public void setAddress(String address) {
+        this.address = address == null ? null : address.trim();
     }
 
     public String getGoodsName() {
@@ -80,14 +78,6 @@ public class Order {
 
     public void setGoodsPrice(BigDecimal goodsPrice) {
         this.goodsPrice = goodsPrice;
-    }
-
-    public Integer getOrderChannel() {
-        return orderChannel;
-    }
-
-    public void setOrderChannel(Integer orderChannel) {
-        this.orderChannel = orderChannel;
     }
 
     public Integer getStatus() {

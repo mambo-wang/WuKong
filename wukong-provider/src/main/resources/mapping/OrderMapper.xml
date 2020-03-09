@@ -5,18 +5,17 @@
     <id column="id" property="id" jdbcType="BIGINT" />
     <result column="user_id" property="userId" jdbcType="BIGINT" />
     <result column="goods_id" property="goodsId" jdbcType="BIGINT" />
-    <result column="delivery_addr_id" property="deliveryAddrId" jdbcType="BIGINT" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
     <result column="goods_name" property="goodsName" jdbcType="VARCHAR" />
     <result column="goods_count" property="goodsCount" jdbcType="INTEGER" />
     <result column="goods_price" property="goodsPrice" jdbcType="DECIMAL" />
-    <result column="order_channel" property="orderChannel" jdbcType="INTEGER" />
     <result column="status" property="status" jdbcType="INTEGER" />
     <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
     <result column="pay_date" property="payDate" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, user_id, goods_id, delivery_addr_id, goods_name, goods_count, goods_price, order_channel, 
-    status, create_date, pay_date
+    id, user_id, goods_id, address, goods_name, goods_count, goods_price, status, create_date, 
+    pay_date
   </sql>
   <insert id="insertSelective" parameterType="com.wukong.provider.entity.Order" useGeneratedKeys="true" keyProperty="id" >
     insert into tbl_order
@@ -27,8 +26,8 @@
       <if test="goodsId != null" >
         goods_id,
       </if>
-      <if test="deliveryAddrId != null" >
-        delivery_addr_id,
+      <if test="address != null" >
+        address,
       </if>
       <if test="goodsName != null" >
         goods_name,
@@ -38,9 +37,6 @@
       </if>
       <if test="goodsPrice != null" >
         goods_price,
-      </if>
-      <if test="orderChannel != null" >
-        order_channel,
       </if>
       <if test="status != null" >
         status,
@@ -59,8 +55,8 @@
       <if test="goodsId != null" >
         #{goodsId,jdbcType=BIGINT},
       </if>
-      <if test="deliveryAddrId != null" >
-        #{deliveryAddrId,jdbcType=BIGINT},
+      <if test="address != null" >
+        #{address,jdbcType=VARCHAR},
       </if>
       <if test="goodsName != null" >
         #{goodsName,jdbcType=VARCHAR},
@@ -70,9 +66,6 @@
       </if>
       <if test="goodsPrice != null" >
         #{goodsPrice,jdbcType=DECIMAL},
-      </if>
-      <if test="orderChannel != null" >
-        #{orderChannel,jdbcType=INTEGER},
       </if>
       <if test="status != null" >
         #{status,jdbcType=INTEGER},
@@ -94,8 +87,8 @@
       <if test="goodsId != null" >
         goods_id = #{goodsId,jdbcType=BIGINT},
       </if>
-      <if test="deliveryAddrId != null" >
-        delivery_addr_id = #{deliveryAddrId,jdbcType=BIGINT},
+      <if test="address != null" >
+        address = #{address,jdbcType=VARCHAR},
       </if>
       <if test="goodsName != null" >
         goods_name = #{goodsName,jdbcType=VARCHAR},
@@ -105,9 +98,6 @@
       </if>
       <if test="goodsPrice != null" >
         goods_price = #{goodsPrice,jdbcType=DECIMAL},
-      </if>
-      <if test="orderChannel != null" >
-        order_channel = #{orderChannel,jdbcType=INTEGER},
       </if>
       <if test="status != null" >
         status = #{status,jdbcType=INTEGER},

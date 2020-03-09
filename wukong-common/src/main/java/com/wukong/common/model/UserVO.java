@@ -13,4 +13,12 @@ public class UserVO implements Serializable {
     private String name;
 
     private String username;
+
+    private String address;
+
+    private String phoneNumber;
+
+    private String email;
+
+    private Integer score;
 }

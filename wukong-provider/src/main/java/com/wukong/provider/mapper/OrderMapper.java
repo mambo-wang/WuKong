@@ -17,15 +17,15 @@ public interface OrderMapper {
 
     @Insert({
         "insert into tbl_order (user_id, goods_id, ",
-        "delivery_addr_id, goods_name, ",
+        "address, goods_name, ",
         "goods_count, goods_price, ",
-        "order_channel, status, ",
-        "create_date, pay_date)",
+        "status, create_date, ",
+        "pay_date)",
         "values (#{userId,jdbcType=BIGINT}, #{goodsId,jdbcType=BIGINT}, ",
-        "#{deliveryAddrId,jdbcType=BIGINT}, #{goodsName,jdbcType=VARCHAR}, ",
+        "#{address,jdbcType=VARCHAR}, #{goodsName,jdbcType=VARCHAR}, ",
         "#{goodsCount,jdbcType=INTEGER}, #{goodsPrice,jdbcType=DECIMAL}, ",
-        "#{orderChannel,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, ",
-        "#{createDate,jdbcType=TIMESTAMP}, #{payDate,jdbcType=TIMESTAMP})"
+        "#{status,jdbcType=INTEGER}, #{createDate,jdbcType=TIMESTAMP}, ",
+        "#{payDate,jdbcType=TIMESTAMP})"
     })
     @Options(useGeneratedKeys=true,keyProperty="id")
     int insert(Order record);
@@ -34,8 +34,8 @@ public interface OrderMapper {
 
     @Select({
         "select",
-        "id, user_id, goods_id, delivery_addr_id, goods_name, goods_count, goods_price, ",
-        "order_channel, status, create_date, pay_date",
+        "id, user_id, goods_id, address, goods_name, goods_count, goods_price, status, ",
+        "create_date, pay_date",
         "from tbl_order",
         "where id = #{id,jdbcType=BIGINT}"
     })
@@ -48,11 +48,10 @@ public interface OrderMapper {
         "update tbl_order",
         "set user_id = #{userId,jdbcType=BIGINT},",
           "goods_id = #{goodsId,jdbcType=BIGINT},",
-          "delivery_addr_id = #{deliveryAddrId,jdbcType=BIGINT},",
+          "address = #{address,jdbcType=VARCHAR},",
           "goods_name = #{goodsName,jdbcType=VARCHAR},",
           "goods_count = #{goodsCount,jdbcType=INTEGER},",
           "goods_price = #{goodsPrice,jdbcType=DECIMAL},",
-          "order_channel = #{orderChannel,jdbcType=INTEGER},",
           "status = #{status,jdbcType=INTEGER},",
           "create_date = #{createDate,jdbcType=TIMESTAMP},",
           "pay_date = #{payDate,jdbcType=TIMESTAMP}",

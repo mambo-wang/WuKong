@@ -1,5 +1,6 @@
 package com.wukong.provider.service;
 
+import com.wukong.common.model.AddScoreDTO;
 import com.wukong.common.model.UserVO;
 import com.wukong.provider.controller.vo.LoginVO;
 import com.wukong.provider.dto.UserEditDTO;
@@ -25,4 +26,7 @@ public interface UserService {
     String login(HttpServletResponse response, LoginVO loginVo);
 
     User getByToken(HttpServletResponse response, String token);
+
+    void addScore(AddScoreDTO addScoreDTO);
+
 }

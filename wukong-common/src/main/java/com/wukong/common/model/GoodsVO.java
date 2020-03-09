@@ -1,4 +1,4 @@
-package com.wukong.consumer.controller;
+package com.wukong.common.model;
 
 import lombok.Data;
 

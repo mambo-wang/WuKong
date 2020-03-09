@@ -2,6 +2,7 @@ package com.wukong.provider.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.wukong.common.exception.BusinessException;
+import com.wukong.common.model.AddScoreDTO;
 import com.wukong.common.model.UserVO;
 import com.wukong.provider.config.redis.RedisConfig;
 import com.wukong.provider.controller.vo.LoginVO;
@@ -17,6 +18,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -105,6 +107,14 @@ public class UserServiceImpl implements UserService {
             addCookie(response, token, user);
         }
         return user ;
+    }
+
+    @Transactional
+    @Override
+    public void addScore(AddScoreDTO addScoreDTO) {
+        User user = userMapper.selectByUsername(addScoreDTO.getUsername());
+        user.setScore(user.getScore() + addScoreDTO.getScoreToAdd());
+        userMapper.updateByPrimaryKey(user);
     }
 
     private void addCookie(HttpServletResponse response, String token, User user) {

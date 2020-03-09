@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface GoodsRepository extends PagingAndSortingRepository<Goods, Long>, JpaSpecificationExecutor<Goods> {
 
@@ -14,4 +16,6 @@ public interface GoodsRepository extends PagingAndSortingRepository<Goods, Long>
     @Modifying
     @Query(value = "update tbl_goods set stock = stock - 1 where id = ?1 and stock > 0", nativeQuery = true)
     int reduceStock(Long goodsId);
+
+    List<Goods> findByDeleted(String deleted);
 }

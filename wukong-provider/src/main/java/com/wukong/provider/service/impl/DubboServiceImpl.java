@@ -4,7 +4,6 @@ import com.alibaba.dubbo.config.annotation.Service;
 import com.wukong.common.dubbo.DubboService;
 import com.wukong.common.model.UserVO;
 import com.wukong.provider.entity.User;
-import com.wukong.provider.mapper.UserMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
