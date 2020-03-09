@@ -1,4 +1,4 @@
-package com.wukong.provider.config.ftp;
+package com.wukong.common.autoconfig.ftp;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
@@ -18,24 +17,22 @@ import java.nio.charset.StandardCharsets;
  * FTP工具类
  * @author dq
  */
-
 @Slf4j
-@Data
-@Component
-@PropertySource(value = "classpath:conf/ftp.properties", ignoreResourceNotFound = true)
-@Configuration
 public class FtpService {
 
     private FTPClient ftpClient = null;
 
-    @Value("${ftp.host}")
     private String server;
-    @Value("${ftp.port}")
     private int port;
-    @Value("${ftp.username}")
     private String userName;
-    @Value("${ftp.password}")
     private String userPassword;
+
+    public FtpService(String server, int port, String userName, String userPassword) {
+        this.server = server;
+        this.port = port;
+        this.userName = userName;
+        this.userPassword = userPassword;
+    }
 
     /**
      * 连接服务器

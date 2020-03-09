@@ -1,5 +1,6 @@
 package com.wukong.service.controller;
 
+import com.wukong.common.autoconfig.ftp.FtpService;
 import com.wukong.common.model.BaseResult;
 import com.wukong.service.repository.LogRepository;
 import com.wukong.service.repository.entity.OperationLog;
@@ -9,6 +10,9 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/logs")
 public class LogController {
+
+    @Autowired
+    private FtpService ftpService;
 
     @Autowired
     private LogRepository logRepository;
