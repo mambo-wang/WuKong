@@ -54,8 +54,6 @@ public class HelloController {
         helloSender.send();
         neoSender.send(1);
         neoSender2.send(2);
-        //todo 用stringManager发送的中文乱码
-        objectSender.send(dubboService.getUser(username));
         topicSender.send();
         topicSender.send1();
         topicSender.send2();

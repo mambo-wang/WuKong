@@ -9,6 +9,7 @@ import com.wukong.provider.service.OrderService;
 import com.wukong.provider.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +25,7 @@ public class OrderServiceImpl implements OrderService {
     private OrderMapper orderMapper;
 
     @Autowired
-    private StringRedisTemplate stringRedisTemplate;
+    private StringRedisTemplate redisTemplate;
 
     @Autowired
     private UserService userService;
@@ -44,10 +45,10 @@ public class OrderServiceImpl implements OrderService {
         order.setStatus(Constant.Order.STAT_NOT_PAY);
         orderMapper.insert(order);
         //todo
-        if(stringRedisTemplate.hasKey(Constant.RedisKey.KEY_SALES)){
-            stringRedisTemplate.opsForHash().increment(Constant.RedisKey.KEY_SALES, goodsVO.getId(), 1);
+        if(redisTemplate.hasKey(Constant.RedisKey.KEY_SALES)){
+            redisTemplate.opsForHash().increment(Constant.RedisKey.KEY_SALES, goodsVO.getId().toString(), 1);
         } else {
-            stringRedisTemplate.opsForHash().put(Constant.RedisKey.KEY_SALES, goodsVO.getId(), 1);
+            redisTemplate.opsForHash().put(Constant.RedisKey.KEY_SALES, goodsVO.getId().toString(), 1);
         }
     }
 }

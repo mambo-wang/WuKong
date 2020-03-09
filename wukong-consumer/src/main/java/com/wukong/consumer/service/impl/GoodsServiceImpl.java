@@ -1,5 +1,6 @@
 package com.wukong.consumer.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.wukong.common.model.BasePage;
 import com.wukong.common.model.GoodsVO;
 import com.wukong.common.utils.Constant;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +31,7 @@ public class GoodsServiceImpl implements GoodsService, InitializingBean {
     private GoodsRepository goodsRepository;
 
     @Autowired
-    private StringRedisTemplate stringRedisTemplate;
+    private StringRedisTemplate redisTemplate;
 
     @Override
     public BasePage<GoodsVO> queryPageable(int pageNo, int pageSize) {
@@ -42,10 +44,12 @@ public class GoodsServiceImpl implements GoodsService, InitializingBean {
 
     @Override
     public List<GoodsVO> queryAll() {
-        HashOperations<String, Long, GoodsVO> hashOperations = stringRedisTemplate.opsForHash();
-        List<GoodsVO>  goodsVOS = hashOperations.values(Constant.RedisKey.KEY_GOODS);
-        if(CollectionUtils.isNotEmpty(goodsVOS)){
-            return goodsVOS;
+        if(redisTemplate.hasKey(Constant.RedisKey.KEY_GOODS)){
+            HashOperations<String, String, String> hashOperations = redisTemplate.opsForHash();
+            List<String>  goodsVOS = hashOperations.values(Constant.RedisKey.KEY_GOODS);
+            if(CollectionUtils.isNotEmpty(goodsVOS)){
+                return goodsVOS.stream().map(s -> JSONObject.parseObject(s, GoodsVO.class)).collect(Collectors.toList());
+            }
         }
         List<Goods> goods = goodsRepository.findByDeleted("n");
         return convert(goods);
@@ -53,27 +57,28 @@ public class GoodsServiceImpl implements GoodsService, InitializingBean {
 
     @Override
     public GoodsVO getOne(Long goodsId) {
-        HashOperations<String, Long, GoodsVO> hashOperations = stringRedisTemplate.opsForHash();
-        return hashOperations.get(Constant.RedisKey.KEY_GOODS, goodsId);
+        HashOperations<String, String, String> hashOperations = redisTemplate.opsForHash();
+        return JSONObject.parseObject(hashOperations.get(Constant.RedisKey.KEY_GOODS, goodsId.toString()), GoodsVO.class);
     }
 
     @Override
     public void addGoods(GoodsVO goodsVO) {
         Goods saved = goodsRepository.save(convert(goodsVO));
-        stringRedisTemplate.opsForHash().put(Constant.RedisKey.KEY_GOODS, saved.getId(), saved);
+        redisTemplate.opsForHash().put(Constant.RedisKey.KEY_GOODS, saved.getId().toString(), JSONObject.toJSONString(saved));
     }
 
     @Override
     public void modifyGoods(GoodsVO goodsVO) {
         Goods goods = convert(goodsVO);
         Goods saved = goodsRepository.save(goods);
-        stringRedisTemplate.opsForHash().put(Constant.RedisKey.KEY_GOODS, saved.getId(), saved);
+        redisTemplate.opsForHash().put(Constant.RedisKey.KEY_GOODS, saved.getId().toString(), JSONObject.toJSONString(saved));
     }
 
     @Override
     public void removeGoods(List<Long> ids) {
-        HashOperations<String, Long, GoodsVO> hashOperations = stringRedisTemplate.opsForHash();
-        hashOperations.delete(Constant.RedisKey.KEY_GOODS, ids);
+        HashOperations<String, Long, GoodsVO> hashOperations = redisTemplate.opsForHash();
+        //todo
+        hashOperations.delete(Constant.RedisKey.KEY_GOODS, ids.toArray());
         ids.forEach(id -> goodsRepository.deleteById(id));
     }
 
@@ -105,8 +110,8 @@ public class GoodsServiceImpl implements GoodsService, InitializingBean {
         List<GoodsVO> goodsVOS = queryAll();
 
         goodsVOS.forEach(goods -> {
-            stringRedisTemplate.opsForHash().put(Constant.RedisKey.KEY_GOODS, goods.getId(), goods);
-            stringRedisTemplate.opsForHash().put(Constant.RedisKey.KEY_STOCK, goods.getId(), goods.getStock());
+            redisTemplate.opsForHash().put(Constant.RedisKey.KEY_GOODS, goods.getId().toString(), JSONObject.toJSONString(goods));
+            redisTemplate.opsForHash().put(Constant.RedisKey.KEY_STOCK, goods.getId().toString(), goods.getStock().toString());
         });
     }
 }

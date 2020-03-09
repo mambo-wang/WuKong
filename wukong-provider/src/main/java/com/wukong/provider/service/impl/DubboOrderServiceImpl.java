@@ -8,7 +8,6 @@ import com.wukong.common.utils.Constant;
 import com.wukong.provider.entity.Order;
 import com.wukong.provider.service.OrderService;
 import com.wukong.provider.service.UserService;
-import org.graalvm.compiler.core.common.type.ArithmeticOpTable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

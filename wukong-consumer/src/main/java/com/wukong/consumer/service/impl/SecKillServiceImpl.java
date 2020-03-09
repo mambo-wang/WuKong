@@ -1,6 +1,7 @@
 package com.wukong.consumer.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.alibaba.fastjson.JSONObject;
 import com.wukong.common.dubbo.DubboOrderService;
 import com.wukong.common.exception.BusinessException;
 import com.wukong.common.model.AddScoreDTO;
@@ -35,20 +36,20 @@ public class SecKillServiceImpl implements SecKillService {
         //检查是否已经买过了（秒杀场景每人限量一份商品），下单后会写入redis ，此处读取redis
 
         //检查是否还有库存,读取redis
-        HashOperations<String, Long, Integer> hashOperations1 = stringRedisTemplate.opsForHash();
-        Integer stock = hashOperations1.get(Constant.RedisKey.KEY_STOCK, goodsId);
+        HashOperations<String, String, String> hashOperations1 = stringRedisTemplate.opsForHash();
+        Integer stock = Integer.valueOf(hashOperations1.get(Constant.RedisKey.KEY_STOCK, goodsId.toString()));
         if(stock <= 0){
             throw new BusinessException("500","寿光");
         }
 
         //预减库存，操作redis
-        stringRedisTemplate.opsForHash().increment(Constant.RedisKey.KEY_STOCK, goodsId, -1);
+        stringRedisTemplate.opsForHash().increment(Constant.RedisKey.KEY_STOCK, goodsId.toString(), -1);
 
         //rabbitMQ发送下单消息，削峰填谷（todo）
 
         //查询商品详情,操作redis
-        HashOperations<String, Long, GoodsVO> hashOperations = stringRedisTemplate.opsForHash();
-        GoodsVO goodsVO = hashOperations.get(Constant.RedisKey.KEY_GOODS, goodsId);
+        HashOperations<String, String, String> hashOperations = stringRedisTemplate.opsForHash();
+        GoodsVO goodsVO = JSONObject.parseObject(hashOperations.get(Constant.RedisKey.KEY_GOODS, goodsId.toString()), GoodsVO.class);
 
         //减库存
         goodsService.reduceStock(goodsId);
