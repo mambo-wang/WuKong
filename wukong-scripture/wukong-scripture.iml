@@ -132,5 +132,6 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.zookeeper:zookeeper:3.4.13" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.yetus:audience-annotations:0.5.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.kafka:kafka_2.11:test:2.0.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.projectlombok:lombok:1.18.2" level="project" />
   </component>
 </module>

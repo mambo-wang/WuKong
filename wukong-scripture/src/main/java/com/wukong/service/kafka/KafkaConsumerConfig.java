@@ -5,6 +5,9 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -20,26 +23,29 @@ import java.util.concurrent.Executors;
  * @author wangbao6
  */
 @Configuration
-public class RealDataConsumer {
+@EnableConfigurationProperties(KafkaConsumerProperties.class)
+public class KafkaConsumerConfig {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RealDataConsumer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(KafkaConsumerConfig.class);
     private String charsetName = "UTF-8";
+
+    @Autowired
+    private KafkaConsumerProperties kafkaConsumerProperties;
+
+    @Value("${spring.kafka.bootstrap-servers}")
+    private String bootstrapServers;
 
     @Bean
     public KafkaConsumer<String, String> kafkaConsumer() {
         Properties props = new Properties();
         /**必须的配置， 代表该消费者所属的 consumer group*/
         props.put("group.id", "testGroup");
-        props.put("bootstrap.servers", "121.43.191.104:9092");
-        props.put("enable.auto.commit", "false");// 自动提交
-        // props.put("auto.commit.interval.ms", "1000");
-        props.put("auto.offset.reset", "latest");// in("latest","earliest","none"),
-        props.put("session.timeout.ms", "30000");//判断consumer是否存活，超过这个时间consumer会被踢出消费者组。 Consumer 端允许下游系统消费一批消息的最大时长
-        props.put("request.timeout.ms", "40000");
-        props.put("heartbeat.interval.ms", "10000");
-//        props.put("max.partition.fetch.bytes", "" + 1024 * 10);
-        props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-        props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        props.put("bootstrap.servers", bootstrapServers);
+        props.put("enable.auto.commit", kafkaConsumerProperties.getEnableAutoCommit());// 自动提交
+         props.put("auto.commit.interval.ms", kafkaConsumerProperties.getAutoCommitInterval());
+        props.put("auto.offset.reset", kafkaConsumerProperties.getAutoOffsetReset());// in("latest","earliest","none"),
+        props.put("key.deserializer", kafkaConsumerProperties.getKeyDeserializer());
+        props.put("value.deserializer", kafkaConsumerProperties.getValueDeserializer());
         KafkaConsumer<String, String> consumer = new KafkaConsumer<String, String>(props);
         consumer.subscribe(Arrays.asList("wukong"));
         start(consumer);

@@ -1,6 +1,5 @@
 package com.wukong.consumer.controller;
 
-import com.wukong.consumer.kafka.RealDataProvider;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
