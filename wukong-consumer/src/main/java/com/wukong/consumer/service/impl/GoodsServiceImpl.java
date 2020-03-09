@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service("goodsService")
@@ -118,6 +119,6 @@ public class GoodsServiceImpl implements GoodsService, InitializingBean {
         goodsVOS.forEach(goods -> {
             redisTemplate.opsForHash().put(Constant.RedisKey.KEY_GOODS, goods.getId().toString(), JSONObject.toJSONString(goods));
             redisTemplate.opsForHash().put(Constant.RedisKey.KEY_STOCK, goods.getId().toString(), goods.getStock().toString());
-        });
+        });//todo 失效机制
     }
 }

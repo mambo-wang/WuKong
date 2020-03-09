@@ -10,8 +10,8 @@
 - mongoDB作为日志服务器
 - aop + redis + 自定义注解 实现接口限流、日志记录
 - 邮件集成
+- kafka集成
 #### todo list
--  kafka集成
 - 实用工具类
 - 分库分表
 - 等等
