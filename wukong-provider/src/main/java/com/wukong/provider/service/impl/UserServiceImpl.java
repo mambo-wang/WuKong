@@ -9,6 +9,7 @@ import com.wukong.provider.controller.vo.LoginVO;
 import com.wukong.provider.dto.UserEditDTO;
 import com.wukong.provider.entity.User;
 import com.wukong.provider.mapper.UserMapper;
+import com.wukong.provider.service.MailService;
 import com.wukong.provider.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -37,6 +38,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
+
+    @Autowired
+    private MailService mailService;
 
     @Override
     public List<UserVO> queryAll() {
@@ -116,6 +120,7 @@ public class UserServiceImpl implements UserService {
         User user = userMapper.selectByUsername(addScoreDTO.getUsername());
         user.setScore(user.getScore() + addScoreDTO.getScoreToAdd());
         userMapper.updateByPrimaryKey(user);
+        mailService.sendSimpleMail("mambo1991@163.com", "【悟空秒杀】积分增加通知","恭喜您下单成功，积分已到账！--悟空");
     }
 
     private void addCookie(HttpServletResponse response, String token, User user) {

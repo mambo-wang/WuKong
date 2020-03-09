@@ -1,6 +1,7 @@
 package com.wukong.consumer.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.wukong.common.exception.BusinessException;
 import com.wukong.common.model.BasePage;
 import com.wukong.common.model.GoodsVO;
 import com.wukong.common.utils.Constant;
@@ -85,7 +86,10 @@ public class GoodsServiceImpl implements GoodsService, InitializingBean {
     @Transactional
     @Override
     public void reduceStock(Long goodsId) {
-        goodsRepository.reduceStock(goodsId);
+        int num = goodsRepository.reduceStock(goodsId);
+        if(num == 0){
+            throw new BusinessException("5555","无库存");
+        }
     }
 
     private List<GoodsVO> convert(List<Goods> goods){

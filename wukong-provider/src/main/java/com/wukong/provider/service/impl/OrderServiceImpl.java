@@ -48,7 +48,7 @@ public class OrderServiceImpl implements OrderService {
         if(redisTemplate.hasKey(Constant.RedisKey.KEY_SALES)){
             redisTemplate.opsForHash().increment(Constant.RedisKey.KEY_SALES, goodsVO.getId().toString(), 1);
         } else {
-            redisTemplate.opsForHash().put(Constant.RedisKey.KEY_SALES, goodsVO.getId().toString(), 1);
+            redisTemplate.opsForHash().put(Constant.RedisKey.KEY_SALES, goodsVO.getId().toString(), "1");
         }
     }
 }

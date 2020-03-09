@@ -21,7 +21,7 @@ public class SecKillServiceImpl implements SecKillService {
     @Autowired
     private GoodsService goodsService;
 
-    @Reference
+    @Reference(timeout=10000, retries=2)
     private DubboOrderService dubboOrderService;
 
     @Autowired
@@ -57,10 +57,9 @@ public class SecKillServiceImpl implements SecKillService {
         //创建订单
         dubboOrderService.addOrder(goodsVO, username);
 
-        //支付（todo 半个小时期限）
+        //支付（todo 半个小时期限，支付后修改订单状态，增加积分）
 
-
-        //增加积分(todo 应该是在支付之后)
+        //增加积分
         objectSender.send(new AddScoreDTO(username, goodsVO.getPrice().intValue()));
 
     }

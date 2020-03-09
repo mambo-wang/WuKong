@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.util.Date;
 
-@Service
+@Service(retries=2)
 @Component
 public class DubboOrderServiceImpl implements DubboOrderService {
 
