@@ -2,6 +2,7 @@ package com.wukong.consumer.config;
 
 import com.wukong.common.utils.DateTimeTool;
 
+import javax.persistence.Column;
 import java.lang.reflect.Field;
 import java.util.*;
 

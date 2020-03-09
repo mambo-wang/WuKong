@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @EnableConfigurationProperties({FtpProperties.class})
-@ConditionalOnProperty(prefix = "ftp", name = "enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(prefix = "ftp", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class FtpAutoConfig {
 
     @Autowired

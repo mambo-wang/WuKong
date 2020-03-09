@@ -22,6 +22,19 @@ public final class DateTimeTool {
     public static final DateTimeFormatter FORMATTER_YM = DateTimeFormatter.ofPattern("yyyy_MM");
 
     /**
+     * 定义规范的UTC时间格式
+     * <br>
+     * 格式效果：2017-10-11T15:49:42.342+08:00
+     */
+    public static final String DATE_FORMAT_UTC = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
+
+    /**
+     * 定义页面默认显示用的时间格式
+     * <br>
+     * 格式效果：2017-02-23 08:04:02
+     */
+    public static final String DATE_FORMAT_DEFAULT_VIEW = "yyyy-MM-dd HH:mm:ss";
+    /**
      * 格式化日期时间
      * @param time      long类型日期
      * @param formatter 时间格式
