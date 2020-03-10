@@ -126,6 +126,5 @@ public class GoodsServiceImpl implements GoodsService, InitializingBean {
             redisTemplate.opsForHash().put(Constant.RedisKey.KEY_STOCK, goods.getId().toString(), goods.getStock().toString());
         });
         redisTemplate.expire(Constant.RedisKey.KEY_GOODS, 10, TimeUnit.MINUTES);
-        redisTemplate.expire(Constant.RedisKey.KEY_STOCK, 10, TimeUnit.MINUTES);
     }
 }
