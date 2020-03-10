@@ -1,25 +1,27 @@
-package com.wukong.provider.config.interceptor;
+package com.wukong.consumer.config;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.wukong.common.annotations.AccessLimit;
 import com.wukong.common.contants.Constant;
 import com.wukong.common.exception.BusinessException;
 import com.wukong.common.exception.CommonErrorCode;
 import com.wukong.common.model.UserVO;
-import com.wukong.provider.config.redis.RedisConfig;
-import com.wukong.provider.entity.User;
-import com.wukong.provider.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.Signature;
-import org.aspectj.lang.annotation.*;
+import org.aspectj.lang.annotation.AfterThrowing;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -40,9 +42,6 @@ import java.util.concurrent.TimeUnit;
 public class RestEasyAop {
 
     @Autowired
-    UserService userService;
-
-    @Autowired
     StringRedisTemplate stringRedisTemplate;
 
     private static String[] types = {"java.lang.Integer", "java.lang.Double",
@@ -52,15 +51,7 @@ public class RestEasyAop {
             "boolean", "char", "float"};
 
     /**
-     * 拦截所有web端访问的controller方法
-     */
-    @Pointcut("execution(* com.wukong.provider.controller.*.*(..)) ")
-    public void controllerMethodPointcut() {
-
-    }
-
-    /**
-     * 拦截所有带AccessLimit注解的方法，记录成功或失败日志
+     * 拦截所有带AccessLimit注解的方法
      */
     @Pointcut("@annotation(com.wukong.common.annotations.AccessLimit)")
     public void accessAnno(){
@@ -100,17 +91,9 @@ public class RestEasyAop {
         }else if(Integer.valueOf(count) < maxCount) {
             stringRedisTemplate.opsForValue().increment(Constant.RedisKey.KEY_ACCESS+ key, 1);
         }else {
+//            render(response, CommonErrorCode.ACCESS_LIMIT_REACHED);
             throw new BusinessException(CommonErrorCode.ACCESS_LIMIT_REACHED.getCode(), CommonErrorCode.ACCESS_LIMIT_REACHED.getMsg());
         }
-    }
-
-
-    @AfterThrowing(pointcut = "controllerMethodPointcut()", throwing= "error")
-    public void controller(JoinPoint point, Throwable error) {
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        String info = String.format("\n =======> request uri: %s  %s", request.getRequestURI(), getMethodInfo(point));
-        log.error("{}, ====> error msg: {}", info, error.getMessage());
-        //todo 错误日志记录到日志分析系统中
     }
 
 
@@ -130,7 +113,25 @@ public class RestEasyAop {
             return null;
         }
         String token = StringUtils.isEmpty(paramToken)?cookieToken:paramToken;
-        return userService.getByToken(response, token);
+        return getByToken(response, token);
+    }
+
+    public UserVO getByToken(HttpServletResponse response, String token) {
+
+        if(StringUtils.isEmpty(token)){
+            return null ;
+        }
+
+        UserVO user = JSONObject.parseObject(String.valueOf(stringRedisTemplate.opsForHash().get(Constant.RedisKey.KEY_TOKEN, token)), UserVO.class);
+        if(user!=null) {
+            stringRedisTemplate.opsForHash().put(Constant.RedisKey.KEY_TOKEN, token, JSONObject.toJSONString(user));
+            Cookie cookie = new Cookie("token", token);
+            //设置有效期
+            cookie.setMaxAge(20000);
+            cookie.setPath("/");
+            response.addCookie(cookie);
+        }
+        return user ;
     }
 
     private String getCookieValue(HttpServletRequest request, String cookiName) {

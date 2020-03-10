@@ -1,16 +1,17 @@
 package com.wukong.provider.config.interceptor;
 
+import com.wukong.common.model.UserVO;
 import com.wukong.provider.entity.User;
 
 public class UserContext {
 	
-	private static ThreadLocal<User> userHolder = new ThreadLocal<User>();
+	private static ThreadLocal<UserVO> userHolder = new ThreadLocal<UserVO>();
 	
-	public static void setUser(User user) {
+	public static void setUser(UserVO user) {
 		userHolder.set(user);
 	}
 	
-	public static User getUser() {
+	public static UserVO getUser() {
 		return userHolder.get();
 	}
 

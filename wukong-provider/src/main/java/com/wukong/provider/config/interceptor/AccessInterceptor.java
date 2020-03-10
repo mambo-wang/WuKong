@@ -1,7 +1,10 @@
 package com.wukong.provider.config.interceptor;
 
 import com.alibaba.fastjson.JSON;
+import com.wukong.common.annotations.AccessLimit;
+import com.wukong.common.contants.Constant;
 import com.wukong.common.exception.CommonErrorCode;
+import com.wukong.common.model.UserVO;
 import com.wukong.provider.config.redis.RedisConfig;
 import com.wukong.provider.entity.User;
 import com.wukong.provider.service.UserService;
@@ -9,7 +12,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.method.HandlerMethod;
@@ -45,7 +47,7 @@ public class AccessInterceptor  extends HandlerInterceptorAdapter {
 			logger.info("打印拦截方法handler ：{} ",handler);
 			HandlerMethod hm = (HandlerMethod)handler;
 			//根据token获取user信息放入threadLocal
-			User user = getUser(request, response);
+			UserVO user = getUser(request, response);
 			UserContext.setUser(user);
 
 			AccessLimit accessLimit = hm.getMethodAnnotation(AccessLimit.class);
@@ -65,13 +67,13 @@ public class AccessInterceptor  extends HandlerInterceptorAdapter {
 			}else {
 				//do nothing
 			}
-			String count = stringRedisTemplate.opsForValue().get(RedisConfig.REDIS_KEY_ACCESS + key);
+			String count = stringRedisTemplate.opsForValue().get(Constant.RedisKey.KEY_ACCESS + key);
 	    	if(count  == null) {
-				stringRedisTemplate.opsForValue().increment(RedisConfig.REDIS_KEY_ACCESS+ key, 1);
+				stringRedisTemplate.opsForValue().increment(Constant.RedisKey.KEY_ACCESS+ key, 1);
 
-				stringRedisTemplate.expire(RedisConfig.REDIS_KEY_ACCESS+ key, seconds, TimeUnit.SECONDS);
+				stringRedisTemplate.expire(Constant.RedisKey.KEY_ACCESS+ key, seconds, TimeUnit.SECONDS);
 			}else if(Integer.valueOf(count) < maxCount) {
-	    		 stringRedisTemplate.opsForValue().increment(RedisConfig.REDIS_KEY_ACCESS+ key, 1);
+	    		 stringRedisTemplate.opsForValue().increment(Constant.RedisKey.KEY_ACCESS+ key, 1);
 	    	}else {
 	    		render(response, CommonErrorCode.ACCESS_LIMIT_REACHED);
 	    		return false;
@@ -95,7 +97,7 @@ public class AccessInterceptor  extends HandlerInterceptorAdapter {
 		out.close();
 	}
 
-	private User getUser(HttpServletRequest request, HttpServletResponse response) {
+	private UserVO getUser(HttpServletRequest request, HttpServletResponse response) {
 		String paramToken = request.getParameter("token");
 		String cookieToken = getCookieValue(request, "token");
 		if(StringUtils.isEmpty(cookieToken) && StringUtils.isEmpty(paramToken)) {

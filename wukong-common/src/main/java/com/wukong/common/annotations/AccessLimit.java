@@ -1,4 +1,4 @@
-package com.wukong.provider.config.interceptor;
+package com.wukong.common.annotations;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Retention;

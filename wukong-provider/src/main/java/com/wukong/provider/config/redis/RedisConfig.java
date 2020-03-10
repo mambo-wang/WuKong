@@ -3,6 +3,7 @@ package com.wukong.provider.config.redis;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.wukong.common.contants.Constant;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.cache.annotation.EnableCaching;
@@ -28,10 +29,6 @@ import java.util.Set;
 @Configuration
 @EnableCaching
 public class RedisConfig extends CachingConfigurerSupport {
-
-    public static final String REDIS_KEY_USER = "redis-user";
-    public static final String REDIS_KEY_TOKEN = "redis-token";
-    public static final String REDIS_KEY_ACCESS = "redis-access";
 
     /**
      * 生成key的策略 根据类名+方法名+所有参数的值生成唯一的一个key
@@ -68,12 +65,12 @@ public class RedisConfig extends CachingConfigurerSupport {
 
         // 设置一个初始化的缓存空间set集合
         Set<String> cacheNames = new HashSet<>();
-        cacheNames.add(REDIS_KEY_USER);
+        cacheNames.add(Constant.RedisKey.KEY_USER);
         cacheNames.add("my-redis-cache2");
 
         // 对每个缓存空间应用不同的配置
         Map<String, RedisCacheConfiguration> configMap = new HashMap<>();
-        configMap.put(REDIS_KEY_USER, config);
+        configMap.put(Constant.RedisKey.KEY_USER, config);
         configMap.put("my-redis-cache2", config.entryTtl(Duration.ofSeconds(1200)));
 
         RedisCacheManager cacheManager = RedisCacheManager.builder(redisConnectionFactory)     // 使用自定义的缓存配置初始化一个cacheManager

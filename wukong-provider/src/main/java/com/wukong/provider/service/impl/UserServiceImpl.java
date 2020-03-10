@@ -1,6 +1,7 @@
 package com.wukong.provider.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.wukong.common.contants.Constant;
 import com.wukong.common.exception.BusinessException;
 import com.wukong.common.model.AddScoreDTO;
 import com.wukong.common.model.UserVO;
@@ -97,17 +98,17 @@ public class UserServiceImpl implements UserService {
 
         //生成cookie 将session返回游览器 分布式session
         String token= UUID.randomUUID().toString();
-        addCookie(response, token, user);
+        addCookie(response, token, convertToVO(user));
         return token;
     }
 
     @Override
-    public User getByToken(HttpServletResponse response, String token) {
+    public UserVO getByToken(HttpServletResponse response, String token) {
 
         if(StringUtils.isEmpty(token)){
             return null ;
         }
-        User user = JSONObject.parseObject(String.valueOf(stringRedisTemplate.opsForHash().get(RedisConfig.REDIS_KEY_TOKEN, token)), User.class);
+        UserVO user = JSONObject.parseObject(String.valueOf(stringRedisTemplate.opsForHash().get(Constant.RedisKey.KEY_TOKEN, token)), UserVO.class);
         if(user!=null) {
             addCookie(response, token, user);
         }
@@ -123,8 +124,8 @@ public class UserServiceImpl implements UserService {
         mailService.sendSimpleMail("mambo1991@163.com", "【悟空秒杀】积分增加通知","恭喜您下单成功，积分已到账！--悟空");
     }
 
-    private void addCookie(HttpServletResponse response, String token, User user) {
-        stringRedisTemplate.opsForHash().put(RedisConfig.REDIS_KEY_TOKEN, token, JSONObject.toJSONString(user));
+    private void addCookie(HttpServletResponse response, String token, UserVO user) {
+        stringRedisTemplate.opsForHash().put(Constant.RedisKey.KEY_TOKEN, token, JSONObject.toJSONString(user));
         Cookie cookie = new Cookie("token", token);
         //设置有效期
         cookie.setMaxAge(20000);

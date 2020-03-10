@@ -25,7 +25,7 @@ public interface UserService {
 
     String login(HttpServletResponse response, LoginVO loginVo);
 
-    User getByToken(HttpServletResponse response, String token);
+    UserVO getByToken(HttpServletResponse response, String token);
 
     void addScore(AddScoreDTO addScoreDTO);
 

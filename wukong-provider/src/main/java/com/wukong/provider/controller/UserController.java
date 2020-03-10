@@ -2,7 +2,7 @@ package com.wukong.provider.controller;
 
 import com.wukong.common.model.BaseResult;
 import com.wukong.common.model.UserVO;
-import com.wukong.provider.config.interceptor.AccessLimit;
+import com.wukong.common.annotations.AccessLimit;
 import com.wukong.provider.controller.vo.LoginVO;
 import com.wukong.provider.dto.UserEditDTO;
 import com.wukong.provider.service.UserService;

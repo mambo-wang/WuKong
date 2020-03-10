@@ -1,4 +1,4 @@
-package com.wukong.common.utils;
+package com.wukong.common.contants;
 
 public interface Constant {
 
@@ -9,6 +9,13 @@ public interface Constant {
         String KEY_STOCK = "wukong_stock";
         //销量缓存
         String KEY_SALES = "wukong_sales";
+
+        String KEY_USER = "wukong_user";
+        String KEY_TOKEN = "wukong_token";
+        /**
+         * 一定时间内用户访问次数
+         */
+        String KEY_ACCESS = "wukong_access";
     }
 
     interface Order{

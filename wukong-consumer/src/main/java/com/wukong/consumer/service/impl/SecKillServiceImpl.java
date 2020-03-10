@@ -6,7 +6,7 @@ import com.wukong.common.dubbo.DubboOrderService;
 import com.wukong.common.exception.BusinessException;
 import com.wukong.common.model.AddScoreDTO;
 import com.wukong.common.model.GoodsVO;
-import com.wukong.common.utils.Constant;
+import com.wukong.common.contants.Constant;
 import com.wukong.consumer.rabbit.object.ObjectSender;
 import com.wukong.consumer.service.GoodsService;
 import com.wukong.consumer.service.SecKillService;
