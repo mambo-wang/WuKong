@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service("goodsService")
@@ -52,7 +53,11 @@ public class GoodsServiceImpl implements GoodsService, InitializingBean {
             }
         }
         List<Goods> goods = goodsRepository.findByDeleted("n");
-        return convert(goods);
+        List<GoodsVO> goodsVOS = convert(goods);
+
+        addCache(goodsVOS);
+
+        return goodsVOS;
     }
 
     @Override
@@ -112,11 +117,15 @@ public class GoodsServiceImpl implements GoodsService, InitializingBean {
     @Override
     public void afterPropertiesSet() throws Exception {
         //放入缓存
-        List<GoodsVO> goodsVOS = queryAll();
+        queryAll();
+    }
 
+    private void addCache(List<GoodsVO> goodsVOS){
         goodsVOS.forEach(goods -> {
             redisTemplate.opsForHash().put(Constant.RedisKey.KEY_GOODS, goods.getId().toString(), JSONObject.toJSONString(goods));
             redisTemplate.opsForHash().put(Constant.RedisKey.KEY_STOCK, goods.getId().toString(), goods.getStock().toString());
-        });//todo 失效机制
+        });
+        redisTemplate.expire(Constant.RedisKey.KEY_GOODS, 10, TimeUnit.MINUTES);
+        redisTemplate.expire(Constant.RedisKey.KEY_STOCK, 10, TimeUnit.MINUTES);
     }
 }

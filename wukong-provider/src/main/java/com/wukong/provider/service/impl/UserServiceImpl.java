@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service("userService")
@@ -108,7 +109,7 @@ public class UserServiceImpl implements UserService {
         if(StringUtils.isEmpty(token)){
             return null ;
         }
-        UserVO user = JSONObject.parseObject(String.valueOf(stringRedisTemplate.opsForHash().get(Constant.RedisKey.KEY_TOKEN, token)), UserVO.class);
+        UserVO user = JSONObject.parseObject(String.valueOf(stringRedisTemplate.opsForValue().get(Constant.RedisKey.KEY_TOKEN + token)), UserVO.class);
         if(user!=null) {
             addCookie(response, token, user);
         }
@@ -125,10 +126,10 @@ public class UserServiceImpl implements UserService {
     }
 
     private void addCookie(HttpServletResponse response, String token, UserVO user) {
-        stringRedisTemplate.opsForHash().put(Constant.RedisKey.KEY_TOKEN, token, JSONObject.toJSONString(user));
+        stringRedisTemplate.opsForValue().set(Constant.RedisKey.KEY_TOKEN + token, JSONObject.toJSONString(user), 30 , TimeUnit.MINUTES);
         Cookie cookie = new Cookie("token", token);
         //设置有效期
-        cookie.setMaxAge(20000);
+        cookie.setMaxAge(30 * 1000 * 60);
         cookie.setPath("/");
         response.addCookie(cookie);
     }

@@ -122,12 +122,12 @@ public class RestEasyAop {
             return null ;
         }
 
-        UserVO user = JSONObject.parseObject(String.valueOf(stringRedisTemplate.opsForHash().get(Constant.RedisKey.KEY_TOKEN, token)), UserVO.class);
+        UserVO user = JSONObject.parseObject(String.valueOf(stringRedisTemplate.opsForValue().get(Constant.RedisKey.KEY_TOKEN + token)), UserVO.class);
         if(user!=null) {
-            stringRedisTemplate.opsForHash().put(Constant.RedisKey.KEY_TOKEN, token, JSONObject.toJSONString(user));
+            stringRedisTemplate.opsForValue().set(Constant.RedisKey.KEY_TOKEN + token, JSONObject.toJSONString(user), 30, TimeUnit.MINUTES);
             Cookie cookie = new Cookie("token", token);
             //设置有效期
-            cookie.setMaxAge(20000);
+            cookie.setMaxAge(30 * 60 * 1000);
             cookie.setPath("/");
             response.addCookie(cookie);
         }

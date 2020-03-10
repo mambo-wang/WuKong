@@ -55,9 +55,9 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"username\":\"ououou\",\n\t\"password\":\"123456\"\n}"
+							"raw": ""
 						},
-						"url": "http://localhost:8082/users/login"
+						"url": "http://localhost:8082/test"
 					},
 					"response": []
 				},
@@ -148,6 +148,55 @@
 							"raw": ""
 						},
 						"url": "http://localhost:8081/fail"
+					},
+					"response": []
+				},
+				{
+					"name": "秒杀",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://192.168.0.108:8084/secKill?goodsId=1&username=ououou",
+							"protocol": "http",
+							"host": [
+								"192",
+								"168",
+								"0",
+								"108"
+							],
+							"port": "8084",
+							"path": [
+								"secKill"
+							],
+							"query": [
+								{
+									"key": "goodsId",
+									"value": "1"
+								},
+								{
+									"key": "username",
+									"value": "ououou"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "导出",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": "http://127.0.0.1:8084/secKill/export"
 					},
 					"response": []
 				}
