@@ -2,7 +2,7 @@
 
 ###########################################################
 # Program : wukong
-# Func Name: Install or upgrade Athena
+# Func Name: Install or upgrade WuKong
 # USER: wangbao
 # Date Created: 2018/04/18 First release
 # ---------------------------------------------------------

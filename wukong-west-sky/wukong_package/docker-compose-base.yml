@@ -3,7 +3,7 @@ services:
   mysql-server:
     image: "mysql-server:forever"
     restart: always
-    build: mysql-server/
+    build: wukong-database/
     ports:
       - 3307:3306
     volumes:

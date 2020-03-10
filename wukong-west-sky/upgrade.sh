@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ###################################################################
-# Func Name: upgrade athena
+# Func Name: upgrade WuKong
 # Author wangbao 
 # Date Created: 2018/04/25 First release
 #-----------------------------------------------------------------
