@@ -1,4 +1,4 @@
-package com.wukong.provider;
+package com.wukong.service;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -19,11 +19,11 @@ public class SwaggerConfig {
     public Docket createDocket(){
 
         Docket docket = new Docket(DocumentationType.SWAGGER_2)
-                .apiInfo(new ApiInfoBuilder().title("用户、订单API")
-                        .description("用户、订单相关接口API文档")
+                .apiInfo(new ApiInfoBuilder().title("日志采集api")
+                        .description("日志采集相关接口API文档")
                         .version("1.0").build())
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.wukong.provider.controller"))
+                .apis(RequestHandlerSelectors.basePackage("com.wukong.service.controller"))
                 .paths(PathSelectors.any())
                 .build();
         return docket;

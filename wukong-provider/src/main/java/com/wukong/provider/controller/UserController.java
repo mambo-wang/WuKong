@@ -10,8 +10,10 @@ import com.wukong.provider.controller.vo.UserImportVO;
 import com.wukong.provider.dto.UserEditDTO;
 import com.wukong.provider.dto.UserImportDTO;
 import com.wukong.provider.service.UserService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -24,6 +26,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+@Api(value = "用戶控制器")
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -42,8 +45,9 @@ public class UserController {
         return BaseResult.success(userService.findById(id));
     }
 
+    @ApiOperation(value = "根据用户名查找")
     @GetMapping("/byUsername")
-    BaseResult<UserVO> findByUsername(@RequestParam(name = "username") String username){
+    BaseResult<UserVO> findByUsername(@ApiParam(value = "用户名") @RequestParam(name = "username") String username){
         return BaseResult.success(userService.findByUsername(username));
     }
 
@@ -65,12 +69,14 @@ public class UserController {
         return BaseResult.success(null);
     }
 
+    @ApiOperation(value = "用户登录")
     @PostMapping("/login")
-    BaseResult removeUser(@RequestBody LoginVO loginVO, HttpServletResponse response){
+    BaseResult login(@RequestBody LoginVO loginVO, HttpServletResponse response){
         String token = userService.login(response, loginVO);
         return BaseResult.success(token);
     }
 
+    @ApiOperation(value = "导出Excel")
     @GetMapping("/export")
     public BaseResult exportGoods(HttpServletResponse response, HttpServletRequest request) throws NoSuchFieldException, IllegalAccessException, IOException {
 

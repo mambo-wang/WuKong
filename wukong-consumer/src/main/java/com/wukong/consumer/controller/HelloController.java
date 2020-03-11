@@ -48,7 +48,7 @@ public class HelloController {
      * 测试rmq
      * @return
      */
-    @RequestMapping(value = "/rmq")
+    @GetMapping(value = "/rmq")
     public BaseResult rmq(@RequestParam(name = "seconds")int seconds, @RequestParam(name = "username") String username) {
         fanoutSender.send();
         helloSender.send();

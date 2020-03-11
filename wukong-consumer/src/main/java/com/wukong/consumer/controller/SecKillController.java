@@ -6,6 +6,8 @@ import com.wukong.common.model.GoodsVO;
 import com.wukong.common.utils.ExcelTool;
 import com.wukong.consumer.service.GoodsService;
 import com.wukong.consumer.service.SecKillService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +21,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+@Api(value = "秒杀接口")
 @RestController
 @RequestMapping("/secKill")
 public class SecKillController {
@@ -35,6 +38,7 @@ public class SecKillController {
      * @param username 用户名
      * @return 结果
      */
+    @ApiOperation(value = "秒杀商品")
     @AccessLimit(seconds = 60, maxCount = 5, needLogin = false)
     @GetMapping()
     public BaseResult secKill(@RequestParam(name = "goodsId")Long goodsId, @RequestParam(name = "username")String username){
@@ -42,6 +46,7 @@ public class SecKillController {
         return BaseResult.success(null);
     }
 
+    @ApiOperation(value = "导出商品清单")
     @GetMapping("/export")
     public BaseResult exportGoods(HttpServletResponse response, HttpServletRequest request) throws NoSuchFieldException, IllegalAccessException, IOException {
 
