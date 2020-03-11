@@ -486,6 +486,36 @@ public final class ExcelTool<T> {
         return sheet;
     }
 
+    /**
+     * 生成合并单元格的表头
+     * @param workbook
+     * @param sheetName
+     * @param headers
+    //     * @param cellSize 每个表头占用杰单元格
+     * @return
+     */
+    public static Sheet createVariableCellSizeHeaderWithRichText(Workbook workbook,String sheetName, List<MergeHeader> headers) {
+
+        Sheet sheet = workbook.getSheet(sheetName);
+        sheet.setDefaultColumnWidth((short) 20);
+        // 生成一个样式
+        CellStyle style = ExcelTool.getHeadCellStyle(workbook);
+
+        int cellIndex = -1;
+        // 产生表格表头行
+        Row row = sheet.createRow(ROW_VARIABLE_HEADER_CELL_SIZE_INDEX);
+        int totalSize = headers.stream().mapToInt(MergeHeader::getSize).sum();
+        IntStream.rangeClosed(0, totalSize -1).boxed().map(row::createCell).forEach(cell -> cell.setCellStyle(style));
+
+        for (int i = 0; i < headers.size(); i++) {
+            sheet.addMergedRegion(new CellRangeAddress(ROW_VARIABLE_HEADER_CELL_SIZE_INDEX,ROW_VARIABLE_HEADER_CELL_SIZE_INDEX, cellIndex + 1, cellIndex + headers.get(i).getSize() ));
+            Cell cell = row.getCell(cellIndex + 1);
+            cell.setCellValue(headers.get(i).getRichTextString());
+            cellIndex += cellIndex + headers.get(i).getSize();
+        }
+        return sheet;
+    }
+
 
     /**
      * 创建富文本表头
@@ -508,6 +538,17 @@ public final class ExcelTool<T> {
             richTextStrings.add(richTextString);
         }
         return richTextStrings;
+    }
+
+    public static RichTextString convertToRichText(Workbook workbook, String header) {
+        String[] headSplit = StringUtils.split(header, "|");
+        String wholeHead = StringUtils.remove(header, "|");
+        RichTextString richTextString = new HSSFRichTextString(wholeHead);
+        richTextString.applyFont(0, headSplit[0].length(), getHeadFont(workbook));
+        if (headSplit.length > 1) {
+            richTextString.applyFont(headSplit[0].length(), wholeHead.length(), getMouldCellFont(workbook));
+        }
+        return richTextString;
     }
 
     /**
@@ -554,6 +595,8 @@ public final class ExcelTool<T> {
                         field.set(t, Double.valueOf(cell.getStringCellValue()));
                     } else if(field.getType() == Float.class) {
                         field.set(t, Float.valueOf(cell.getStringCellValue()));
+                    } else if(field.getType() == Long.class) {
+                        field.set(t, Long.valueOf(cell.getStringCellValue()));
                     }
                     // todo 添加更多类型
                 }
@@ -666,7 +709,7 @@ public final class ExcelTool<T> {
                     cell.setCellValue("");
                 } else if(field.getType() == String.class){
                     String value = String.valueOf(insertToCell);
-                    if(value.contains("http")){
+                    if(pic && value.contains("http")){
 
                         if(!pic){
                             cell.setCellFormula("HYPERLINK(\"" + value + "\")");
@@ -783,5 +826,31 @@ public final class ExcelTool<T> {
         }
 
         return new byte[]{};
+    }
+
+    public static class MergeHeader{
+        private RichTextString richTextString;
+        private int size;
+
+        public MergeHeader(RichTextString richTextString, int size) {
+            this.richTextString = richTextString;
+            this.size = size;
+        }
+
+        public RichTextString getRichTextString() {
+            return richTextString;
+        }
+
+        public void setRichTextString(RichTextString richTextString) {
+            this.richTextString = richTextString;
+        }
+
+        public int getSize() {
+            return size;
+        }
+
+        public void setSize(int size) {
+            this.size = size;
+        }
     }
 }

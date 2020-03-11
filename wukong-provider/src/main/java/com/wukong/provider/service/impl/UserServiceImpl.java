@@ -5,15 +5,20 @@ import com.wukong.common.contants.Constant;
 import com.wukong.common.exception.BusinessException;
 import com.wukong.common.model.AddScoreDTO;
 import com.wukong.common.model.UserVO;
+import com.wukong.common.utils.ExcelTool;
 import com.wukong.provider.config.redis.RedisConfig;
 import com.wukong.provider.controller.vo.LoginVO;
+import com.wukong.provider.controller.vo.UserImportVO;
 import com.wukong.provider.dto.UserEditDTO;
+import com.wukong.provider.dto.UserImportDTO;
 import com.wukong.provider.entity.User;
 import com.wukong.provider.mapper.UserMapper;
 import com.wukong.provider.service.MailService;
 import com.wukong.provider.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -22,12 +27,13 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.io.IOException;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -123,6 +129,62 @@ public class UserServiceImpl implements UserService {
         user.setScore(user.getScore() + addScoreDTO.getScoreToAdd());
         userMapper.updateByPrimaryKey(user);
         mailService.sendSimpleMail("mambo1991@163.com", "【悟空秒杀】积分增加通知","恭喜您下单成功，"+addScoreDTO.getScoreToAdd()+"积分已到账！--悟空");
+    }
+
+    @Override
+    public Workbook createExcelTemplate() {
+        HSSFWorkbook workbook = new HSSFWorkbook();
+        List<String> commonHeaders = Arrays.asList("姓名|（必填）","用户名|（必填）","收货地址|（必填）","电话|（选填）","邮箱|（必填）");
+        ExcelTool.createSheetWithRichTextHeader(workbook, "template", ExcelTool.convertToRichText(workbook, commonHeaders));
+        ExcelTool.MergeHeader mergeHeader = new ExcelTool.MergeHeader(ExcelTool.convertToRichText(workbook, "请按要求如实填写基本信息"), 5);
+        ExcelTool.createVariableCellSizeHeaderWithRichText(workbook, "template", Arrays.asList(mergeHeader));
+        ExcelTool.createTitleRow(workbook, "template", "用户信息表", 5);
+        return workbook;
+    }
+
+    public UserImportVO uploadExcel(MultipartFile file) throws InstantiationException, IllegalAccessException, IOException {
+        Workbook workbook = ExcelTool.createWorkbook(file.getOriginalFilename(), file.getInputStream());
+        if(Objects.isNull(workbook)){
+            throw new BusinessException("300001", "文件读取失败");
+        }
+        List<UserImportDTO> userImportDTOS = new ExcelTool<UserImportDTO>().getDataFromExcel(workbook, UserImportDTO.class);
+
+        List<UserImportDTO> errorData = userImportDTOS.stream().filter(this::checkDataOfVillageIfError).collect(Collectors.toList());
+
+        if(CollectionUtils.isEmpty(errorData)){
+            //导入
+            importData(userImportDTOS);
+            return new UserImportVO(true, userImportDTOS);
+        } else {
+            return new UserImportVO(false, errorData);
+        }
+
+    }
+
+    private void importData(List<UserImportDTO> userImportDTOS){
+
+        for (UserImportDTO userImportDTO : userImportDTOS) {
+            User user = new User();
+            BeanUtils.copyProperties(userImportDTO, user);
+            user.setScore(0);
+            user.setPassword("123456");
+            userMapper.insert(user);
+        }
+    }
+
+    /**
+     * 如果数据不合法，返回true
+     * @param userImportDTO
+     * @return
+     */
+    private boolean checkDataOfVillageIfError(UserImportDTO userImportDTO) {
+        if(StringUtils.isEmpty(userImportDTO.getName()) ||
+                StringUtils.isEmpty(userImportDTO.getUsername()) ||
+                StringUtils.isEmpty(userImportDTO.getAddress()) ||
+                StringUtils.isEmpty(userImportDTO.getPhoneNumber())){
+            return true;
+        }
+        return false;
     }
 
     private void addCookie(HttpServletResponse response, String token, UserVO user) {
