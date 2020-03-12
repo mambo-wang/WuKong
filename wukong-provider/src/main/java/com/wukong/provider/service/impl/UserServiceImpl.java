@@ -52,7 +52,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserVO> queryAll() {
-        log.info("走的数据库");
         return userMapper.getAll().stream().map(this::convertToVO).collect(Collectors.toList());
     }
 
@@ -69,7 +68,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserVO findByUsername(String username) {
-        log.info("走的数据库");
         return convertToVO(userMapper.selectByUsername(username));
     }
 

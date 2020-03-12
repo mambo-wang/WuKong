@@ -42,6 +42,7 @@ public class OrderServiceImpl implements OrderService {
         order.setGoodsName(goodsVO.getName());
         order.setGoodsPrice(BigDecimal.valueOf(goodsVO.getPrice()));
         order.setStatus(Constant.Order.STAT_NOT_PAY);
+        order.setPayDate(new Date());
         orderMapper.insert(order);
         //todo
         if(redisTemplate.hasKey(Constant.RedisKey.KEY_SALES)){
