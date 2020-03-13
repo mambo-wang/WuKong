@@ -14,4 +14,5 @@ public class GoodsVO implements Serializable {
     private String detail;
     private Double price;
     private Integer stock;
+    private String deleted;//n上架 y下架
 }

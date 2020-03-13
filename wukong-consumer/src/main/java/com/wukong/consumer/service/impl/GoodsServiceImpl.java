@@ -9,6 +9,7 @@ import com.wukong.consumer.repository.GoodsRepository;
 import com.wukong.consumer.repository.entity.Goods;
 import com.wukong.consumer.service.GoodsService;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.shardingsphere.api.hint.HintManager;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +37,7 @@ public class GoodsServiceImpl implements GoodsService, InitializingBean {
 
     @Override
     public BasePage<GoodsVO> queryPageable(int pageNo, int pageSize) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize, new Sort(Sort.Direction.ASC, "id"));
+        Pageable pageable = PageRequest.of(pageNo -1, pageSize, new Sort(Sort.Direction.ASC, "id"));
         Page<Goods> page = goodsRepository.findAll(pageable);
 
         BasePage<GoodsVO> basePage = new BasePage<>(page.getTotalElements(), convert(page.getContent()));
@@ -52,6 +53,8 @@ public class GoodsServiceImpl implements GoodsService, InitializingBean {
                 return goodsVOS.stream().map(s -> JSONObject.parseObject(s, GoodsVO.class)).collect(Collectors.toList());
             }
         }
+        // 强制路由主库
+//        HintManager.getInstance().setMasterRouteOnly();
         List<Goods> goods = goodsRepository.findByDeleted("n");
         List<GoodsVO> goodsVOS = convert(goods);
 
@@ -108,10 +111,10 @@ public class GoodsServiceImpl implements GoodsService, InitializingBean {
         return goodsVO;
     }
 
-    private Goods convert(GoodsVO goods){
-        Goods goodsVO = new Goods();
-        BeanUtils.copyProperties(goods, goodsVO);
-        return goodsVO;
+    private Goods convert(GoodsVO goodsVO){
+        Goods goods = new Goods();
+        BeanUtils.copyProperties(goodsVO, goods);
+        return goods;
     }
 
     @Override
