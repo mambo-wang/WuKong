@@ -6,10 +6,9 @@ import com.wukong.common.exception.BusinessException;
 import com.wukong.common.model.AddScoreDTO;
 import com.wukong.common.model.UserVO;
 import com.wukong.common.utils.ExcelTool;
-import com.wukong.provider.config.redis.RedisConfig;
 import com.wukong.provider.controller.vo.LoginVO;
 import com.wukong.provider.controller.vo.UserImportVO;
-import com.wukong.provider.dto.UserEditDTO;
+import com.wukong.provider.controller.vo.UserEditVO;
 import com.wukong.provider.dto.UserImportDTO;
 import com.wukong.provider.entity.User;
 import com.wukong.provider.mapper.UserMapper;
@@ -23,7 +22,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -72,15 +70,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserVO addUser(UserEditDTO userEditDTO) {
-        userMapper.insert(convertToDO(userEditDTO));
-        return findByUsername(userEditDTO.getUsername());
+    public UserVO addUser(UserEditVO userEditVO) {
+        userMapper.insert(convertToDO(userEditVO));
+        return findByUsername(userEditVO.getUsername());
     }
 
-    @CacheEvict(value = "redis-user", key = "'user' + #userEditDTO.id")
+    @CacheEvict(value = "redis-user", key = "'user' + #userEditVO.id")
     @Override
-    public void modifyUser(UserEditDTO userEditDTO) {
-        userMapper.updateByPrimaryKey(convertToDO(userEditDTO));
+    public void modifyUser(UserEditVO userEditVO) {
+        userMapper.updateByPrimaryKey(convertToDO(userEditVO));
     }
 
     @Override
@@ -202,9 +200,12 @@ public class UserServiceImpl implements UserService {
         return userVO;
     }
 
-    private User convertToDO(UserEditDTO userEditDTO){
+    private User convertToDO(UserEditVO userEditVO){
         User user = new User();
-        BeanUtils.copyProperties(userEditDTO, user);
+        if(Objects.nonNull(userEditVO.getId())){
+            user = userMapper.selectByPrimaryKey(userEditVO.getId());
+        }
+        BeanUtils.copyProperties(userEditVO, user, "score");
         return user;
     }
 }

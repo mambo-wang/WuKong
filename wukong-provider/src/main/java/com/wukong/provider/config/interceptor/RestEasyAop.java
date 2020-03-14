@@ -87,8 +87,9 @@ public class RestEasyAop {
         if(needLogin) {
             if(user == null) {
                 render(response, CommonErrorCode.SESSION_ERROR);
+            } else {
+                key += "_" + user.getUsername();
             }
-            key += "_" + user.getUsername();
         }else {
             //do nothing
         }

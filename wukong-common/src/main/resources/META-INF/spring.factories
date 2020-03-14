@@ -1,2 +1,3 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.wukong.common.autoconfig.ftp.FtpAutoConfig
+com.wukong.common.autoconfig.ftp.FtpAutoConfig,\
+com.wukong.common.exception.GlobleControllerExceptionHandler

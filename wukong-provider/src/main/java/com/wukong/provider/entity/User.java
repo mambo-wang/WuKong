@@ -15,7 +15,7 @@ public class User {
 
     private String email;
 
-    private Integer score;
+    private Integer score = 0;
 
     public Long getId() {
         return id;

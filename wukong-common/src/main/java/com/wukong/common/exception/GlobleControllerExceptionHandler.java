@@ -2,21 +2,30 @@ package com.wukong.common.exception;
 
 import com.wukong.common.model.BaseResult;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.ValidationException;
+import java.util.List;
+import java.util.Set;
 
 
 @ControllerAdvice
+@Component
 @Slf4j
 public class GlobleControllerExceptionHandler {
 
   /**
    * 业务异常处理
-   * @author J.SUN 2019-01-18
-   * @param businessException
-   * @return com.hikvision.ga.common.BaseResult
-   * @since 1.0.0
    */
   @ExceptionHandler(value = BusinessException.class)
   @ResponseBody
@@ -25,13 +34,48 @@ public class GlobleControllerExceptionHandler {
     return BaseResult.fail(businessException.getCode(), businessException.getMessage());
   }
 
+    /**
+     * url参数的参数校验
+     */
+  @ExceptionHandler
+  @ResponseBody
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public BaseResult handle(ValidationException exception) {
+    if(exception instanceof ConstraintViolationException){
+      ConstraintViolationException exs = (ConstraintViolationException) exception;
+
+      Set<ConstraintViolation<?>> violations = exs.getConstraintViolations();
+      StringBuilder stringBuilder = new StringBuilder();
+      for (ConstraintViolation<?> item : violations) {
+        /**打印验证不通过的信息*/
+        stringBuilder.append(item.getMessage());
+      }
+      return BaseResult.fail("400", stringBuilder.toString()) ;
+
+    }
+    return BaseResult.fail("400", "参数校验有误，请重新提交请求。") ;
+  }
+
+    /**
+     * model参数校验
+     */
+    @ExceptionHandler
+    @ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public BaseResult handleMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
+        BindingResult result = exception.getBindingResult();
+        StringBuilder stringBuilder = new StringBuilder();
+        if(result.hasErrors()){
+            List<ObjectError> allErrors = result.getAllErrors();
+            for (ObjectError error : allErrors) {
+                stringBuilder.append(error.getDefaultMessage());
+            }
+        }
+        return BaseResult.fail("400", stringBuilder.toString()) ;
+    }
+
   /**
    * 默认异常处理
-   *
-   * @author J.SUN 2018-04-25
-   * @param e
-   * @return org.springframework.web.servlet.ModelAndView
-   * @since 1.0.0
    */
   @ExceptionHandler(value = Exception.class)
   @ResponseBody

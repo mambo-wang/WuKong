@@ -1,18 +1,16 @@
 package com.wukong.service.repository.entity;
 
-import com.alibaba.fastjson.JSONObject;
-import com.wukong.common.utils.DateTimeTool;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.io.Serializable;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Document(collection = "operationLog")//相当于数据库里的表名
 public class OperationLog {
 
     private String module;

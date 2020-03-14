@@ -4,9 +4,7 @@ import com.wukong.common.model.AddScoreDTO;
 import com.wukong.common.model.UserVO;
 import com.wukong.provider.controller.vo.LoginVO;
 import com.wukong.provider.controller.vo.UserImportVO;
-import com.wukong.provider.dto.UserEditDTO;
-import com.wukong.provider.dto.UserImportDTO;
-import com.wukong.provider.entity.User;
+import com.wukong.provider.controller.vo.UserEditVO;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,9 +20,9 @@ public interface UserService {
 
     UserVO findByUsername(String username);
 
-    UserVO addUser(UserEditDTO userEditDTO);
+    UserVO addUser(UserEditVO userEditVO);
 
-    void modifyUser(UserEditDTO userEditDTO);
+    void modifyUser(UserEditVO userEditVO);
 
     void removeUser(List<Long> ids);
 
