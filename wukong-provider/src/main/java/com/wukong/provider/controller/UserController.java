@@ -4,6 +4,7 @@ import com.wukong.common.model.BaseResult;
 import com.wukong.common.model.UserVO;
 import com.wukong.common.annotations.AccessLimit;
 import com.wukong.common.utils.ExcelTool;
+import com.wukong.common.autoconfig.validator.GroupModify;
 import com.wukong.provider.controller.vo.LoginVO;
 import com.wukong.provider.controller.vo.UserImportVO;
 import com.wukong.provider.controller.vo.UserEditVO;
@@ -60,7 +61,7 @@ public class UserController {
     }
 
     @PutMapping
-    public BaseResult modifyUser(@RequestBody @Valid UserEditVO userEditVO){
+    public BaseResult modifyUser(@RequestBody @Validated({GroupModify.class}) UserEditVO userEditVO){
         userService.modifyUser(userEditVO);
         return BaseResult.success(null);
     }

@@ -1,4 +1,4 @@
-package com.wukong.provider.config.validator;
+package com.wukong.common.autoconfig.validator;
 
 import org.hibernate.validator.HibernateValidator;
 import org.springframework.context.annotation.Bean;
@@ -10,7 +10,7 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
 @Configuration
-public class ValidatorConfiguration {
+public class WuKongValidatorConfiguration {
     @Bean
     public MethodValidationPostProcessor methodValidationPostProcessor() {
         MethodValidationPostProcessor postProcessor = new MethodValidationPostProcessor();
