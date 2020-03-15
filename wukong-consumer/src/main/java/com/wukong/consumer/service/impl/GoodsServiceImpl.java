@@ -92,13 +92,11 @@ public class GoodsServiceImpl implements GoodsService, InitializingBean {
 
     @Transactional
     @Override
-    public void reduceStock(Long goodsId) {
+    public int reduceStock(Long goodsId) {
         int num = goodsRepository.reduceStock(goodsId);
-        if(num == 0){
-            throw new BusinessException("5555","无库存");
-        }
         Goods goods = goodsRepository.findById(goodsId).get();
         redisTemplate.opsForHash().put(Constant.RedisKey.KEY_GOODS, goods.getId().toString(), JSONObject.toJSONString(goods));
+        return num;
     }
 
     private List<GoodsVO> convert(List<Goods> goods){

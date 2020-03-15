@@ -4,5 +4,5 @@ import com.wukong.common.model.GoodsVO;
 
 public interface OrderService {
 
-    void createOrder(GoodsVO goodsVO, String username);
+    int createOrder(GoodsVO goodsVO, String username);
 }

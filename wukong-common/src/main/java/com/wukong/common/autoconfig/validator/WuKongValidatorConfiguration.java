@@ -9,8 +9,16 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
+/**
+ * 校验器配置
+ */
 @Configuration
 public class WuKongValidatorConfiguration {
+
+    /**
+     * 支持类级别注解@Validated使其方法中的校验注解生效
+     * @return
+     */
     @Bean
     public MethodValidationPostProcessor methodValidationPostProcessor() {
         MethodValidationPostProcessor postProcessor = new MethodValidationPostProcessor();

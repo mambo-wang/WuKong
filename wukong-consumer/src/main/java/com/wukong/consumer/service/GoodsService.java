@@ -19,6 +19,6 @@ public interface GoodsService {
 
      void removeGoods(List<Long> ids);
 
-     void reduceStock(Long goodsId);
+     int reduceStock(Long goodsId);
 
  }

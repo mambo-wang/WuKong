@@ -7,6 +7,9 @@ import java.lang.annotation.Target;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+/**
+ * 限流接口注解
+ */
 @Retention(RUNTIME)
 @Target(METHOD)
 public @interface AccessLimit {

@@ -13,7 +13,9 @@ import java.util.Date;
 import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-
+/**
+ * 自定义日期字符串校验规则
+ */
 @Target({FIELD, PARAMETER})
 @Retention(RUNTIME)
 @Documented

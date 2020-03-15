@@ -7,6 +7,9 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * ftp自动配置类
+ */
 @Configuration
 @EnableConfigurationProperties({FtpProperties.class})
 @ConditionalOnProperty(prefix = "ftp", name = "enabled", havingValue = "true", matchIfMissing = false)
