@@ -25,9 +25,6 @@ import javax.servlet.http.HttpServletRequest;
 public class LogAop {
 
     @Autowired
-    private KafkaTemplate<String,String> kafkaTemplate;
-
-    @Autowired
     private KafkaProducer<String, String> kafkaProducer;
 
     /**
@@ -46,7 +43,7 @@ public class LogAop {
         log.error("{}, ====> error msg: {}", info, error.getMessage());
         String log = OperationLogVO.failure(OperationLogVO.MODULE_CONSUMER, request.getRequestURI() + " " + point.getSignature().toString(), error.toString(), "system");
         ProducerRecord<String, String> record = new ProducerRecord<>("wukong", log);
-        kafkaProducer.send(record);
+        kafkaProducer.send(record, new KafkaCallback());
     }
 
     @AfterReturning(pointcut="controllerMethodPointcut()", returning="retVal")
@@ -55,7 +52,7 @@ public class LogAop {
         System.out.println("[afterReturningAdvice] Returning: " + retVal.toString() );
         String log = OperationLogVO.success(OperationLogVO.MODULE_CONSUMER, jp.getSignature().toString(), retVal.toString(),"admin");
         ProducerRecord<String, String> record = new ProducerRecord<>("wukong", log);
-        kafkaProducer.send(record);
+        kafkaProducer.send(record, new KafkaCallback());
     }
 
 
