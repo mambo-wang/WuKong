@@ -13,7 +13,7 @@ public class DubboPayServiceImpl implements DubboPayService {
     public BaseResult payMoney(Double price, String username) {
 
         System.out.println("全局事务id ：" + RootContext.getXID());
-//        return BaseResult.fail("500","支付失败");
-        return BaseResult.success(1);
+        return BaseResult.fail("500","支付失败");
+//        return BaseResult.success(1);
     }
 }
