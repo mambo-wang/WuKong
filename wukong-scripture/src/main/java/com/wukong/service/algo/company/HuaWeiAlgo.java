@@ -1,4 +1,4 @@
-package com.wukong.service.algo.huawei;
+package com.wukong.service.algo.company;
 
 /**
  * 华为面试真题
