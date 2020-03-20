@@ -43,6 +43,8 @@ public class KafkaConsumerConfig {
         props.put("auto.offset.reset", kafkaConsumerProperties.getAutoOffsetReset());// in("latest","earliest","none"),
         props.put("key.deserializer", kafkaConsumerProperties.getKeyDeserializer());
         props.put("value.deserializer", kafkaConsumerProperties.getValueDeserializer());
+        props.put("max.poll.records", kafkaConsumerProperties.getMaxPollRecords());
+//        props.put("session.timeout.ms", "3000");
         KafkaConsumer<String, String> consumer = new KafkaConsumer<String, String>(props);
         return consumer;
     }

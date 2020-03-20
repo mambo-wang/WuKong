@@ -16,6 +16,7 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @Slf4j
@@ -43,6 +44,7 @@ public class KafkaConsumers {
             try {
                 while (true) {
                     ConsumerRecords records = consumer.poll(Duration.ofSeconds(2));
+                    TimeUnit.MILLISECONDS.sleep(5000);
                     process(records);
                     consumer.commitAsync();
                 }

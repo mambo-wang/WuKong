@@ -18,4 +18,6 @@ public class KafkaConsumerProperties {
     private String keyDeserializer;
 
     private String valueDeserializer;
+
+    private int maxPollRecords;
 }
