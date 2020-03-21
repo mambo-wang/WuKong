@@ -1,5 +1,6 @@
 package com.wukong.service.kafka;
 
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -45,6 +46,8 @@ public class KafkaConsumerConfig {
         props.put("value.deserializer", kafkaConsumerProperties.getValueDeserializer());
         props.put("max.poll.records", kafkaConsumerProperties.getMaxPollRecords());
         props.put("fetch.min.size", kafkaConsumerProperties.getFetchMinSize());
+        props.put(ConsumerConfig.HEARTBEAT_INTERVAL_MS_CONFIG, kafkaConsumerProperties.getHeartbeatInterval());
+        props.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, kafkaConsumerProperties.getMaxPollInterval());
         KafkaConsumer<String, String> consumer = new KafkaConsumer<String, String>(props);
         return consumer;
     }

@@ -22,4 +22,8 @@ public class KafkaConsumerProperties {
     private int maxPollRecords;
 
     private String fetchMinSize;
+
+    private String heartbeatInterval;
+
+    private String maxPollInterval;
 }
