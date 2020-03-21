@@ -37,7 +37,8 @@ public class KafkaProducerConfig {
         // -1：这意味着producer在follower副本确认接收到数据后才算一次发送完成。
         // 此选项提供最好的耐久性，我们保证没有信息将丢失，只要至少一个同步副本保持存活。
         props.put("acks", kafkaProducerProperties.getAcks());
-//        props.put("batch.size", kafkaProducerProperties.getBatchSize());
+        props.put("compression.type", kafkaProducerProperties.getCompressionType());
+        props.put("batch.size", kafkaProducerProperties.getBatchSize());
 //        props.put("buffer.memory", kafkaProducerProperties.getBufferMemory());
         KafkaProducer<String, String> producer = new KafkaProducer<String, String>(props);
         return producer;

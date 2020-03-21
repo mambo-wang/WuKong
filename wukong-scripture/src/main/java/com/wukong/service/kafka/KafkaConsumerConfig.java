@@ -44,6 +44,7 @@ public class KafkaConsumerConfig {
         props.put("key.deserializer", kafkaConsumerProperties.getKeyDeserializer());
         props.put("value.deserializer", kafkaConsumerProperties.getValueDeserializer());
         props.put("max.poll.records", kafkaConsumerProperties.getMaxPollRecords());
+        props.put("fetch.min.size", kafkaConsumerProperties.getFetchMinSize());
 //        props.put("session.timeout.ms", "3000");
         KafkaConsumer<String, String> consumer = new KafkaConsumer<String, String>(props);
         return consumer;

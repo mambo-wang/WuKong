@@ -20,4 +20,6 @@ public class KafkaConsumerProperties {
     private String valueDeserializer;
 
     private int maxPollRecords;
+
+    private String fetchMinSize;
 }
