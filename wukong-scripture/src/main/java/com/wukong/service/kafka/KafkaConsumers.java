@@ -44,17 +44,17 @@ public class KafkaConsumers {
             try {
                 while (true) {
                     ConsumerRecords records = consumer.poll(Duration.ofSeconds(2));
-                    TimeUnit.SECONDS.sleep(10);
+                    TimeUnit.SECONDS.sleep(8);
                     process(records);
-//                    consumer.commitAsync();
+                    consumer.commitAsync();
                 }
             } catch (Throwable e) {
                 log.error("consumer exception", e);
             } finally {
                 try {
-//                    consumer.commitSync();
+                    consumer.commitSync();
                 } finally {
-//                    consumer.close();
+                    consumer.close();
                 }
             }
         });
