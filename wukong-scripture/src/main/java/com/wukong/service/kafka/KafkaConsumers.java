@@ -44,7 +44,6 @@ public class KafkaConsumers {
             try {
                 while (true) {
                     ConsumerRecords records = consumer.poll(Duration.ofSeconds(2));
-                    TimeUnit.MILLISECONDS.sleep(5000);
                     process(records);
                     consumer.commitAsync();
                 }
