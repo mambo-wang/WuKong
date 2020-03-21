@@ -1,6 +1,7 @@
 package com.wukong.service.kafka;
 
 import com.alibaba.fastjson.JSONObject;
+import com.wukong.common.concurrent.WuKongExecutorServices;
 import com.wukong.service.repository.LogRepository;
 import com.wukong.service.repository.entity.OperationLog;
 import lombok.extern.slf4j.Slf4j;
@@ -8,13 +9,13 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.io.UnsupportedEncodingException;
 import java.time.Duration;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -23,30 +24,43 @@ import java.util.concurrent.TimeUnit;
 public class KafkaConsumers {
 
     @Autowired
+    @Qualifier("kafkaConsumer")
     private KafkaConsumer<String, String> kafkaConsumer;
+
+    @Autowired
+    @Qualifier("secondaryKafkaConsumer")
+    private KafkaConsumer<String, String> secondaryKafkaConsumer;
 
     @Autowired
     private LogRepository logRepository;
 
     private String charsetName = "UTF-8";
 
+    ExecutorService executors = WuKongExecutorServices.get().getIoBusyService();
+
     @PostConstruct
     public void receiveWuKongMsg(){
         kafkaConsumer.subscribe(Arrays.asList("wukong"));
-        start(kafkaConsumer);
+        start(kafkaConsumer, "kafkaConsumer");
+
+        secondaryKafkaConsumer.subscribe(Arrays.asList("wukong"));
+        start(secondaryKafkaConsumer, "secondaryKafkaConsumer");
     }
 
-    public void start(KafkaConsumer consumer) {
+    public void start(KafkaConsumer consumer, String metadata) {
 
-        Executors.newSingleThreadExecutor().submit(() -> {
+        executors.submit(() -> {
             // 鉴权认证
-            log.info("----------------begin receive data------------------------");
             try {
                 while (true) {
                     ConsumerRecords records = consumer.poll(Duration.ofSeconds(2));
-                    TimeUnit.SECONDS.sleep(8);
-                    process(records);
-                    consumer.commitAsync();
+                    if (records != null && !records.isEmpty()) {
+                        log.info("----------------poll msg success from {} ------------------------", metadata);
+                        process(records);
+                        consumer.commitAsync();
+                    } else {
+                        TimeUnit.SECONDS.sleep(1);
+                    }
                 }
             } catch (Throwable e) {
                 log.error("consumer exception", e);

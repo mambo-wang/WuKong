@@ -11,9 +11,9 @@ import java.util.concurrent.TimeUnit;
  * 任务执行的线程池
  */
 @Slf4j
-public class VDIExecutorServices {
+public class WuKongExecutorServices {
 
-    private static final VDIExecutorServices instance = new VDIExecutorServices();
+    private static final WuKongExecutorServices instance = new WuKongExecutorServices();
 
     /** 缺省的核心线程数 */
     private static final int THREAD_CORE = 6;
@@ -27,7 +27,7 @@ public class VDIExecutorServices {
     /** 缺省的队列大小 */
     private static final int THREAD_CAPACITY = 1024;
 
-    public static VDIExecutorServices get() {
+    public static WuKongExecutorServices get() {
         return instance;
     }
 

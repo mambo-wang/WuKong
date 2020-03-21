@@ -33,7 +33,7 @@ public class KafkaConsumerConfig {
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
 
-    @Bean
+    @Bean(name = "kafkaConsumer")
     public KafkaConsumer<String, String> kafkaConsumer() {
         Properties props = new Properties();
         /**必须的配置， 代表该消费者所属的 consumer group*/
@@ -48,6 +48,24 @@ public class KafkaConsumerConfig {
         props.put("fetch.min.size", kafkaConsumerProperties.getFetchMinSize());
         props.put(ConsumerConfig.HEARTBEAT_INTERVAL_MS_CONFIG, kafkaConsumerProperties.getHeartbeatInterval());
         props.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, kafkaConsumerProperties.getMaxPollInterval());
+        KafkaConsumer<String, String> consumer = new KafkaConsumer<String, String>(props);
+        return consumer;
+    }
+
+    @Bean(name = "secondaryKafkaConsumer")
+    public KafkaConsumer<String, String> secondaryKafkaConsumer() {
+        Properties props = new Properties();
+        props.put("group.id", "testGroup");
+        props.put("bootstrap.servers", bootstrapServers);
+        props.put("enable.auto.commit", kafkaConsumerProperties.getEnableAutoCommit());// 自动提交
+        props.put("auto.commit.interval.ms", kafkaConsumerProperties.getAutoCommitInterval());
+        props.put("auto.offset.reset", kafkaConsumerProperties.getAutoOffsetReset());// in("latest","earliest","none"),
+        props.put("key.deserializer", kafkaConsumerProperties.getKeyDeserializer());
+        props.put("value.deserializer", kafkaConsumerProperties.getValueDeserializer());
+        props.put("max.poll.records", kafkaConsumerProperties.getMaxPollRecords());
+        props.put("fetch.min.size", kafkaConsumerProperties.getFetchMinSize());
+        props.put(ConsumerConfig.HEARTBEAT_INTERVAL_MS_CONFIG, kafkaConsumerProperties.getHeartbeatInterval());
+        props.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG,  kafkaConsumerProperties.getMaxPollInterval());
         KafkaConsumer<String, String> consumer = new KafkaConsumer<String, String>(props);
         return consumer;
     }

@@ -1,6 +1,6 @@
 package com.wukong.common.request;
 
-import com.wukong.common.concurrent.VDIExecutorServices;
+import com.wukong.common.concurrent.WuKongExecutorServices;
 import com.wukong.common.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -19,7 +19,7 @@ import java.util.concurrent.ExecutorService;
 public class RequestMgrImpl implements RequestMgr {
 
 
-    private ExecutorService ioService = VDIExecutorServices.get().getIoBusyService();
+    private ExecutorService ioService = WuKongExecutorServices.get().getIoBusyService();
 
     private Map<String, RequestReceiver> listeners = new ConcurrentHashMap<>();
 

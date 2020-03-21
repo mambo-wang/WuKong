@@ -23,7 +23,7 @@ public class LogController {
 
     @PostMapping
     public BaseResult queryLog(@RequestBody OperationLog operationLog){
-        FtpService ftpServices = BaseHolder.getBean("ftpService");//test todo delete
+        FtpService ftpServices = BaseHolder.getBean("ftpService");//todo delete
         return BaseResult.success(logRepository.findLogs(operationLog));
     }
 
