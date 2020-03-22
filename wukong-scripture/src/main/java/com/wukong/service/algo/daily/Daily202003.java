@@ -8,7 +8,30 @@ public class Daily202003 {
 
 //        int[] result = getLeastNumbers(new int[]{4,5,1,6,2,7,3,8}, 4);
         Daily202003 daily202003 = new Daily202003();
-        System.out.println(daily202003.canMeasureWater(3,5,4));
+//        System.out.println(daily202003.canMeasureWater(3,5,4));
+        System.out.println(daily202003.minIncrementForUniq(new int[]{3,2,1,2,1,7}));
+    }
+
+
+    /**日期：3月22日
+     * 945. 题目： 使数组唯一的最小增量
+     * 给定整数数组 A，每次 move 操作将会选择任意 A[i]，并将其递增 1。
+     * 返回使 A 中的每个值都是唯一的最少操作次数。
+     * https://leetcode-cn.com/problems/minimum-increment-to-make-array-unique/solution/ji-shu-onxian-xing-tan-ce-fa-onpai-xu-onlogn-yi-ya/
+     * @return
+     */
+    public int minIncrementForUniq(int[] a){
+
+        Arrays.sort(a);
+        int count = 0;
+        for(int i = 1; i < a.length; i ++){
+            if(a[i] <= a[i-1]){
+                int pre = a[i];
+                a[i] = a[i-1] + 1;
+                count += a[i] - pre;
+            }
+        }
+        return count;
     }
 
     /**
