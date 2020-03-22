@@ -56,10 +56,11 @@ public class KafkaConsumers {
                     ConsumerRecords records = consumer.poll(Duration.ofSeconds(2));
                     if (records != null && !records.isEmpty()) {
                         log.info("----------------poll msg success from {} ------------------------", metadata);
+//                        TimeUnit.SECONDS.sleep(8);
                         process(records);
                         consumer.commitAsync();
                     } else {
-                        TimeUnit.SECONDS.sleep(1);
+                        TimeUnit.SECONDS.sleep(3);
                     }
                 }
             } catch (Throwable e) {
