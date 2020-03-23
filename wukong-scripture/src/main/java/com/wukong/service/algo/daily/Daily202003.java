@@ -6,25 +6,28 @@ public class Daily202003 {
 
     public static void main(String[] args) {
 
-//        int[] result = getLeastNumbers(new int[]{4,5,1,6,2,7,3,8}, 4);
         Daily202003 daily202003 = new Daily202003();
-//        System.out.println(daily202003.canMeasureWater(3,5,4));
+        /**************************************************3.20****************************************************************/
+//        int[] result = getLeastNumbers(new int[]{4,5,1,6,2,7,3,8}, 4);
+        /**************************************************3.21水壶****************************************************************/
+        System.out.println(daily202003.canMeasureWater(3,5,4));
+        /**************************************************3.22****************************************************************/
 //        System.out.println(daily202003.minIncrementForUniq(new int[]{3, 2, 1, 2, 1, 7}));
-
-        ListNode listNode1 = new ListNode(1);
-        ListNode listNode2 = new ListNode(2);
-        ListNode listNode3 = new ListNode(3);
-        ListNode listNode4 = new ListNode(4);
-        ListNode listNode5 = new ListNode(5);
-        ListNode listNode6 = new ListNode(6);
-        listNode1.next = listNode2;
-        listNode2.next = listNode3;
-        listNode3.next = listNode4;
-        listNode4.next = listNode5;
-        listNode5.next = listNode6;
-        ListNode listNode = daily202003.middleNode(listNode1);
-        System.out.println(listNode.val);
-
+        /*****************************************3.23求链表中间节点**************************************************/
+//        ListNode listNode1 = new ListNode(1);
+//        ListNode listNode2 = new ListNode(2);
+//        ListNode listNode3 = new ListNode(3);
+//        ListNode listNode4 = new ListNode(4);
+//        ListNode listNode5 = new ListNode(5);
+//        ListNode listNode6 = new ListNode(6);
+//        listNode1.next = listNode2;
+//        listNode2.next = listNode3;
+//        listNode3.next = listNode4;
+//        listNode4.next = listNode5;
+//        listNode5.next = listNode6;
+//        ListNode listNode = daily202003.middleNode(listNode1);
+//        System.out.println(listNode.val);
+       /******************************************************************************************************************/
     }
 
     /**
@@ -87,9 +90,9 @@ public class Daily202003 {
      * 有两个容量分别为 x升 和 y升 的水壶以及无限多的水。请判断能否通过使用这两个水壶，从而可以得到恰好 z升 的水？
      * https://leetcode-cn.com/problems/water-and-jug-problem/solution/tu-de-yan-du-you-xian-bian-li-by-liweiwei1419/
      *
-     * @param x
-     * @param y
-     * @param z
+     * @param x 桶1容量
+     * @param y 桶2容量
+     * @param z 目标体积
      * @return
      */
     public boolean canMeasureWater(int x, int y, int z) {
@@ -125,7 +128,7 @@ public class Daily202003 {
             List<State> nextStates = getNextStates(curX, curY, x, y);
 
             // 打开以便于观察，调试代码
-            // System.out.println(head + " => " + nextStates);
+             System.out.println(head + " => " + nextStates);
 
             for (State nextState : nextStates) {
                 if (!visited.contains(nextState)) {
