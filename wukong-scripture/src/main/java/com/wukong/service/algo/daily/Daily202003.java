@@ -9,25 +9,72 @@ public class Daily202003 {
 //        int[] result = getLeastNumbers(new int[]{4,5,1,6,2,7,3,8}, 4);
         Daily202003 daily202003 = new Daily202003();
 //        System.out.println(daily202003.canMeasureWater(3,5,4));
-        System.out.println(daily202003.minIncrementForUniq(new int[]{3,2,1,2,1,7}));
+//        System.out.println(daily202003.minIncrementForUniq(new int[]{3, 2, 1, 2, 1, 7}));
+
+        ListNode listNode1 = new ListNode(1);
+        ListNode listNode2 = new ListNode(2);
+        ListNode listNode3 = new ListNode(3);
+        ListNode listNode4 = new ListNode(4);
+        ListNode listNode5 = new ListNode(5);
+        ListNode listNode6 = new ListNode(6);
+        listNode1.next = listNode2;
+        listNode2.next = listNode3;
+        listNode3.next = listNode4;
+        listNode4.next = listNode5;
+        listNode5.next = listNode6;
+        ListNode listNode = daily202003.middleNode(listNode1);
+        System.out.println(listNode.val);
+
+    }
+
+    /**
+     * 时间 3月23日
+     * 题目：876. 链表的中间结点
+     * 给定一个带有头结点 head 的非空单链表，返回链表的中间结点。
+     * 如果有两个中间结点，则返回第二个中间结点。
+     * https://leetcode-cn.com/problems/middle-of-the-linked-list/
+     * 解题思路：快慢指针
+     * @param head
+     * @return
+     */
+    public ListNode middleNode(ListNode head) {
+        ListNode slow = head, fast = head;
+
+        while (fast != null && fast.next != null){
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        return slow;
+    }
+
+    //Definition for singly-linked list.
+    public static class ListNode {
+        int val;
+        ListNode next;
+
+        ListNode(int x) {
+            val = x;
+        }
     }
 
 
-    /**日期：3月22日
+    /**
+     * 日期：3月22日
      * 945. 题目： 使数组唯一的最小增量
      * 给定整数数组 A，每次 move 操作将会选择任意 A[i]，并将其递增 1。
      * 返回使 A 中的每个值都是唯一的最少操作次数。
      * https://leetcode-cn.com/problems/minimum-increment-to-make-array-unique/solution/ji-shu-onxian-xing-tan-ce-fa-onpai-xu-onlogn-yi-ya/
+     *
      * @return
      */
-    public int minIncrementForUniq(int[] a){
+    public int minIncrementForUniq(int[] a) {
 
         Arrays.sort(a);
         int count = 0;
-        for(int i = 1; i < a.length; i ++){
-            if(a[i] <= a[i-1]){
+        for (int i = 1; i < a.length; i++) {
+            if (a[i] <= a[i - 1]) {
                 int pre = a[i];
-                a[i] = a[i-1] + 1;
+                a[i] = a[i - 1] + 1;
                 count += a[i] - pre;
             }
         }
@@ -36,9 +83,10 @@ public class Daily202003 {
 
     /**
      * 日期：3月21日
-     * 题目：水壶问题
+     * 题目：365 水壶问题
      * 有两个容量分别为 x升 和 y升 的水壶以及无限多的水。请判断能否通过使用这两个水壶，从而可以得到恰好 z升 的水？
      * https://leetcode-cn.com/problems/water-and-jug-problem/solution/tu-de-yan-du-you-xian-bian-li-by-liweiwei1419/
+     *
      * @param x
      * @param y
      * @param z
@@ -200,25 +248,26 @@ public class Daily202003 {
      * 题目描述 输入整数数组 arr ，找出其中最小的 k 个数。例如，输入4、5、1、6、2、7、3、8这8个数字，则最小的4个数字是1、2、3、4。
      * 优先级队列知识 https://www.jianshu.com/p/f1fd9b82cb72
      * 题解 https://leetcode-cn.com/problems/zui-xiao-de-kge-shu-lcof/solution/3chong-jie-fa-miao-sha-topkkuai-pai-dui-er-cha-sou/
-     *
+     * <p>
      * 解题思路：// 保持堆的大小为K，然后遍历数组中的数字，遍历的时候做如下判断：
      * // 1. 若目前堆的大小小于K，将当前数字放入堆中。
      * // 2. 否则判断当前数字与大根堆堆顶元素的大小关系，如果当前数字比大根堆堆顶还大，这个数就直接跳过；
      * //    反之如果当前数字比大根堆堆顶小，先poll掉堆顶，再将该数字放入堆中。
+     *
      * @return
      */
-    public static int[] getLeastNumbers(int[] arr, int k){
+    public static int[] getLeastNumbers(int[] arr, int k) {
 
-        if(k == 0 || arr.length == 0){
+        if (k == 0 || arr.length == 0) {
             return new int[0];
         }
 
         //创建大根堆（默认是小根堆，需要重写比较器）
-        Queue<Integer> pq = new PriorityQueue<>((v1,v2) -> v2 - v1);
-        for(int num : arr){
-            if(pq.size() < k){
+        Queue<Integer> pq = new PriorityQueue<>((v1, v2) -> v2 - v1);
+        for (int num : arr) {
+            if (pq.size() < k) {
                 pq.offer(num);
-            } else if(num < pq.peek()){
+            } else if (num < pq.peek()) {
                 pq.poll();
                 pq.offer(num);
             }
@@ -226,8 +275,8 @@ public class Daily202003 {
 
         int[] res = new int[pq.size()];
         int idx = 0;
-        for(int num : pq){
-            res[idx ++] = num;
+        for (int num : pq) {
+            res[idx++] = num;
         }
         return res;
     }
