@@ -10,7 +10,7 @@ public class Daily202003 {
         /**************************************************3.20****************************************************************/
 //        int[] result = getLeastNumbers(new int[]{4,5,1,6,2,7,3,8}, 4);
         /**************************************************3.21水壶****************************************************************/
-        System.out.println(daily202003.canMeasureWater(3,5,4));
+        System.out.println(daily202003.canMeasureWater_BFS(3,5,4));
         /**************************************************3.22****************************************************************/
 //        System.out.println(daily202003.minIncrementForUniq(new int[]{3, 2, 1, 2, 1, 7}));
         /*****************************************3.23求链表中间节点**************************************************/
@@ -88,161 +88,42 @@ public class Daily202003 {
      * 日期：3月21日
      * 题目：365 水壶问题
      * 有两个容量分别为 x升 和 y升 的水壶以及无限多的水。请判断能否通过使用这两个水壶，从而可以得到恰好 z升 的水？
-     * https://leetcode-cn.com/problems/water-and-jug-problem/solution/tu-de-yan-du-you-xian-bian-li-by-liweiwei1419/
-     *
+     * https://leetcode-cn.com/problems/water-and-jug-problem/solution/hu-dan-long-wei-liang-zhang-you-yi-si-de-tu-by-ant/
+     * 解法：极简bfs，我个人的理解是，这种bfs简化的思路是以总水量在讨论，而其他题解都着重于X，Y两种状态来讨论，所以相对多了互相倒水的细节讨论。
+     * 每次改变总水量都能看作是X或Y升的增加，或者是X或Y升的减少，就算是相互倒水其实通过改变倒水方式也是可以化作X或Y的增减。
+     * 这样思路也可以很容易转到数学思路了（然而我并不知道贝祖定理）
+     * 贝祖定理：对于给定的正整数a，b，方程a*x+b*y=c有解的充要条件为c是gcd（a，b）的整数倍（gcd为最大公约数）
      * @param x 桶1容量
      * @param y 桶2容量
      * @param z 目标体积
      * @return
      */
-    public boolean canMeasureWater(int x, int y, int z) {
-        // 特判
-        if (z == 0) {
-            return true;
-        }
-        if (x + y < z) {
+    public boolean canMeasureWater_BFS(int x, int y, int z) {
+        if (z < 0 || z > x + y) {
             return false;
         }
-
-        State initState = new State(0, 0);
-
-        // 广度优先遍历使用队列
-        Queue<State> queue = new LinkedList<>();
-        Set<State> visited = new HashSet<>();
-
-        queue.offer(initState);
-        visited.add(initState);
-
-        while (!queue.isEmpty()) {
-            State head = queue.poll();
-
-            int curX = head.getX();
-            int curY = head.getY();
-
-            // curX + curY == z 比较容易忽略
-            if (curX == z || curY == z || curX + curY == z) {
-                return true;
+        Set<Integer> set = new HashSet<>();
+        Queue<Integer> q = new LinkedList<>();
+        q.offer(0);
+        while (!q.isEmpty()) {
+            int n = q.poll();
+            if (n + x <= x + y && set.add(n + x)) {
+                q.offer(n + x);
             }
-
-            // 从当前状态获得所有可能的下一步的状态
-            List<State> nextStates = getNextStates(curX, curY, x, y);
-
-            // 打开以便于观察，调试代码
-             System.out.println(head + " => " + nextStates);
-
-            for (State nextState : nextStates) {
-                if (!visited.contains(nextState)) {
-                    queue.offer(nextState);
-                    // 添加到队列以后，必须马上设置为已经访问，否则会出现死循环
-                    visited.add(nextState);
-                }
+            if (n + y <= x + y && set.add(n + y)) {
+                q.offer(n + y);
+            }
+            if (n - x >= 0 && set.add(n - x)) {
+                q.offer(n - x);
+            }
+            if (n - y >= 0 && set.add(n - y)) {
+                q.offer(n - y);
+            }
+            if (set.contains(z)) {
+                return true;
             }
         }
         return false;
-    }
-
-    private List<State> getNextStates(int curX, int curY, int x, int y) {
-        List<State> nextStates = new ArrayList<>(8);
-
-        // 以下两个状态，对应操作 1
-        // 外部加水，使得 A 满
-        State nextState1 = new State(x, curY);
-        // 外部加水，使得 B 满
-        State nextState2 = new State(curX, y);
-
-        // 以下两个状态，对应操作 2
-        // 把 A 清空
-        State nextState3 = new State(0, curY);
-        // 把 B 清空
-        State nextState4 = new State(curX, 0);
-
-        // 以下四个状态，对应操作 3
-        // 从 A 到 B，使得 B 满，A 还有剩
-        State nextState5 = new State(curX - (y - curY), y);
-        // 从 A 到 B，此时 A 的水太少，A 倒尽，B 没有满
-        State nextState6 = new State(0, curX + curY);
-
-        // 从 B 到 A，使得 A 满，B 还有剩余
-        State nextState7 = new State(x, curY - (x - curX));
-        // 从 B 到 A，此时 B 的水太少，B 倒尽，A 没有满
-        State nextState8 = new State(curX + curY, 0);
-
-        // 没有满的时候，才需要加水
-        if (curX < x) {
-            nextStates.add(nextState1);
-        }
-        if (curY < y) {
-            nextStates.add(nextState2);
-        }
-
-        // 有水的时候，才需要倒掉
-        if (curX > 0) {
-            nextStates.add(nextState3);
-        }
-        if (curY > 0) {
-            nextStates.add(nextState4);
-        }
-
-        // 有剩余才倒
-        if (curX - (y - curY) > 0) {
-            nextStates.add(nextState5);
-        }
-        if (curY - (x - curX) > 0) {
-            nextStates.add(nextState7);
-        }
-
-        // 倒过去倒不满才倒
-        if (curX + curY < y) {
-            nextStates.add(nextState6);
-        }
-        if (curX + curY < x) {
-            nextStates.add(nextState8);
-        }
-        return nextStates;
-    }
-
-    private class State {
-        private int x;
-        private int y;
-
-        public State(int x, int y) {
-            this.x = x;
-            this.y = y;
-        }
-
-        public int getX() {
-            return x;
-        }
-
-        public int getY() {
-            return y;
-        }
-
-        @Override
-        public String toString() {
-            return "State{" +
-                    "x=" + x +
-                    ", y=" + y +
-                    '}';
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            State state = (State) o;
-            return x == state.x &&
-                    y == state.y;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(x, y);
-        }
     }
 
     /**
