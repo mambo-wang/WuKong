@@ -27,9 +27,44 @@ public class Daily202003 {
 //        listNode5.next = listNode6;
 //        ListNode listNode = daily202003.middleNode(listNode1);
 //        System.out.println(listNode.val);
-       /******************************************************3.24按摩师************************************************************/
-        System.out.println(daily202003.message(new int[]{2,1,4,5,3,1,1,3}));
-        /****************************************************************************************************************************/
+        /******************************************************3.24按摩师************************************************************/
+//        System.out.println(daily202003.message(new int[]{2, 1, 4, 5, 3, 1, 1, 3}));
+        /*******************************************************3.25表面积*********************************************************************/
+        System.out.println(daily202003.surfaceArea(new int[][]{{2,2,2},{2,1,2},{2,2,2}}));
+    }
+
+    /**
+     * 每日一题 3月25日
+     * 892. 三维形体的表面积
+     * 题目：在 N * N 的网格上，我们放置一些 1 * 1 * 1  的立方体。
+     * 每个值 v = grid[i][j] 表示 v 个正方体叠放在对应单元格 (i, j) 上。
+     * 请你返回最终形体的表面积。
+     * 链接：https://leetcode-cn.com/problems/surface-area-of-3d-shapes
+     *
+     * 题解：https://leetcode-cn.com/problems/surface-area-of-3d-shapes/solution/shi-li-you-tu-you-zhen-xiang-jiang-jie-yi-kan-jiu-/
+     * 解题思路：
+     * 首先，一个柱体一个柱体的看，每个柱体是由：2个底面（上表面/下表面）+ 所有的正方体都贡献了4个侧表面积。
+     * 然后，把柱体贴合在一起之后，我们需要把贴合的表面积给减掉，两个柱体贴合的表面积就是 两个柱体高的最小值*2。
+     * @param grid
+     * @return
+     */
+    public int surfaceArea(int[][] grid) {
+        int n = grid.length, area = 0;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                // 先把grid[i][j]赋值给level，省掉了bound check，可以略微略微略微优化一下耗时。。。
+                int level = grid[i][j];
+                if (level > 0) {
+                    // 一个柱体中：2个底面 + 所有的正方体都贡献了4个侧表面积
+                    area += (level * 4) + 2;
+                    // 减掉 i 与 i-1 相贴的两份表面积
+                    area -= i > 0 ? Math.min(level, grid[i - 1][j]) * 2 : 0;
+                    // 减掉 j 与 j-1 相贴的两份表面积
+                    area -= j > 0 ? Math.min(level, grid[i][j - 1]) * 2 : 0;
+                }
+            }
+        }
+        return area;
     }
 
     /**
@@ -39,27 +74,28 @@ public class Daily202003 {
      * 给定一个预约请求序列，替按摩师找到最优的预约集合（总预约时间最长），返回总的分钟数。
      * 题目链接：https://leetcode-cn.com/problems/the-masseuse-lcci
      * 题解：https://zhuanlan.zhihu.com/p/115731099
+     *
      * @param nums
      * @return
      */
-    public int message(int[] nums){
+    public int message(int[] nums) {
 
         int n = nums.length;
         //处理边界问题
-        if(n == 0){
+        if (n == 0) {
             return 0;
         }
-        if(n == 1){
+        if (n == 1) {
             return nums[0];
         }
         //定义dp数组，按照状态转移方程递推
         int[] dp = new int[n];
         dp[0] = nums[0];
-        dp[1] = Math.max(nums[0],nums[1]);
-        for (int i = 2; i < n; i++){
+        dp[1] = Math.max(nums[0], nums[1]);
+        for (int i = 2; i < n; i++) {
             dp[i] = Math.max(dp[i - 1], dp[i - 2] + nums[i]);
         }
-        return dp[n-1];
+        return dp[n - 1];
     }
 
     /**
@@ -69,13 +105,14 @@ public class Daily202003 {
      * 如果有两个中间结点，则返回第二个中间结点。
      * https://leetcode-cn.com/problems/middle-of-the-linked-list/
      * 解题思路：快慢指针
+     *
      * @param head
      * @return
      */
     public ListNode middleNode(ListNode head) {
         ListNode slow = head, fast = head;
 
-        while (fast != null && fast.next != null){
+        while (fast != null && fast.next != null) {
             slow = slow.next;
             fast = fast.next.next;
         }
@@ -125,6 +162,7 @@ public class Daily202003 {
      * 每次改变总水量都能看作是X或Y升的增加，或者是X或Y升的减少，就算是相互倒水其实通过改变倒水方式也是可以化作X或Y的增减。
      * 这样思路也可以很容易转到数学思路了（然而我并不知道贝祖定理）
      * 贝祖定理：对于给定的正整数a，b，方程a*x+b*y=c有解的充要条件为c是gcd（a，b）的整数倍（gcd为最大公约数）
+     *
      * @param x 桶1容量
      * @param y 桶2容量
      * @param z 目标体积
