@@ -128,4 +128,50 @@ public class GoodsServiceImpl implements GoodsService, InitializingBean {
         });
         redisTemplate.expire(Constant.RedisKey.KEY_GOODS, 10, TimeUnit.MINUTES);
     }
+
+//    /** boss直聘笔试题
+//     * 砍价接口
+//     * @param goodsId 商品id
+//     * @param userId 用户Id
+//     * @param wxId 微信用户唯一标识
+//     * @return 提示信息
+//     */
+//    public String bargain(Long goodsId, Long userId, Long wxId){
+//
+//        /*设计砍价表
+//      CREATE TABLE `bargain` (
+//	`id` BIGINT NOT NULL AUTO_INCREMENT,
+//	`goods_id` BIGINT NOT NULL DEFAULT '0',
+//	`user_id` BIGINT NOT NULL DEFAULT '0',
+//	`price` DECIMAL(10,0) NOT NULL DEFAULT '0',
+//	`cut_count` int(2) NOT NULL DEFAULT '0',
+//	PRIMARY KEY (`id`)) */
+//
+//        // 前提：第一步，分享到微信的时候在bargain表中创建一条记录，价格初始值为商品原价
+//        // 第二步，微信好友点击砍价进入该方法，校验当前是否已经到达底价，方法根据goodsId和userId查 bargain表，查看min_price是否为y
+//        Integer cutCount = bargainRepository.findMinPriceByGoodsIdAndUserId(goodsId, userId);
+//
+//        //如果到达底价，返回合适的提示信息
+//        if(cutCount != null && cutCount > 11){
+//            return "砍价结束";
+//        }
+//
+//        //第三步，查询该人是否已经砍过
+//        String value = redisTemplate.opsForHash().get("goodsId + userId", wxId);
+//        if(value != null){
+//            return "不能重复砍价";
+//        }
+//
+//        //第四步，砍价
+//        redisTemplate.opsForHash().put("goodsId + userId", wxId, "1");
+//
+//        Bargain bargain = bargainRepository.findByGoodsId(goodsId);
+//        //修改砍价次数和价格
+//        bargain.setCutCount(bargain.getCutCount +1);
+//        Integer cutPrice = 11 - (bargain.getCutCount);
+//        bargain.setPrice(bargain.getPrice() - cutPrice);
+//        bargainRepository.save(bargain);
+//
+//        return "恭喜您，成功砍掉" + cutPrice + "元";
+//    }
 }

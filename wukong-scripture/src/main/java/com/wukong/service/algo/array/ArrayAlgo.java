@@ -1,6 +1,73 @@
 package com.wukong.service.algo.array;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+
 public class ArrayAlgo {
+
+
+
+    public static void main(String[] args) {
+
+//        System.out.println(removeDuplicates(new int[]{1,1,1,2,3,3,4}));
+        char[] nums1 = new char[]{1,2,3,4,5,6,7};
+        char[] nums2 = new char[]{1,2,3,4,6,7};
+
+//        rotate1(nums, 3);
+
+//        int[] res = retainAll(nums1, nums2);
+        char c = find(nums1, nums2);
+        System.out.println(c);
+    }
+
+
+    /**
+     * 1比2多一个字符，找出它
+     * @param chars1
+     * @param chars2
+     * @return
+     */
+    public static char find(char[] chars1, char[] chars2){
+
+        for (int i = 0; i < chars2.length; i ++){
+            if(chars2[i] != chars1[i]){
+                return chars1[i];
+            }
+        }
+        return chars1[chars1.length-1];
+    }
+
+    /**
+     * 349 两个数组的交集
+     * @param array1
+     * @param array2
+     * @return
+     */
+    public  static int[]  retainAll(int[] array1, int[] array2){
+
+        HashSet<Integer> set = new HashSet<>();
+
+        for (int i : array1){
+            set.add(i);
+        }
+
+        ArrayList<Integer> insect = new ArrayList<>();
+
+        for (int j : array2){
+            if(set.contains(j)){
+                insect.add(j);
+                set.remove(j);
+            }
+        }
+
+        int[] res = new int[insect.size()];
+        int idx = 0;
+        for (int k : insect){
+            res[idx ++] = k;
+        }
+        return res;
+
+    }
 
     /**
      * 时间 11.25
@@ -101,11 +168,5 @@ public class ArrayAlgo {
     }
 
 
-    public static void main(String[] args) {
-
-//        System.out.println(removeDuplicates(new int[]{1,1,1,2,3,3,4}));
-        int[] nums = new int[]{1,2,3,4,5,6,7};
-        rotate1(nums, 3);
-    }
 
 }
