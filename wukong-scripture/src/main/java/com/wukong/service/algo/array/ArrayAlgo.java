@@ -21,10 +21,36 @@ public class ArrayAlgo {
 //        int index = arrayAlgo.pivotIndex(nums1);
 //        System.out.println(index);
         /*****************************747. 至少是其他数字两倍的最大数*****************************************/
-        int[] nums2 = new int[]{ 3, 6, 1, 0};
-        int i = arrayAlgo.dominantIndex(nums2);
-        System.out.println(i);
+        int[] nums2 = new int[]{3, 6, 1, 0};
+//        int i = arrayAlgo.dominantIndex(nums2);
+//        System.out.println(i);
+        /*********************************66 加一**************************************************/
+        int[] res = arrayAlgo.plusOne(nums2);
+        System.out.println();
 
+    }
+
+
+    /**66. 加一
+     *
+     * 给定一个由整数组成的非空数组所表示的非负整数，在该数的基础上加一。
+     * 最高位数字存放在数组的首位， 数组中每个元素只存储单个数字。
+     * 你可以假设除了整数 0 之外，这个整数不会以零开头。
+     *
+     * 题解：https://leetcode-cn.com/problems/plus-one/solution/java-shu-xue-jie-ti-by-yhhzw/
+     * @param digits
+     * @return
+     */
+    public int[] plusOne(int[] digits) {
+
+        for (int i = digits.length - 1; i >= 0; i--) {
+            digits[i]++;
+            digits[i] = digits[i] % 10;
+            if (digits[i] != 0) return digits;
+        }
+        digits = new int[digits.length + 1];
+        digits[0] = 1;
+        return digits;
     }
 
     /**
@@ -32,23 +58,24 @@ public class ArrayAlgo {
      * 在一个给定的数组nums中，总是存在一个最大元素 。
      * 查找数组中的最大元素是否至少是数组中每个其他数字的两倍。
      * 如果是，则返回最大元素的索引，否则返回-1。
+     *
      * @param nums
      * @return
      */
     public int dominantIndex(int[] nums) {
 
-        int max=-1,maxIndex=-1,maxSecond=-1;
+        int max = -1, maxIndex = -1, maxSecond = -1;
 
-        for (int i = 0; i < nums.length; i ++){
-            if(nums[i] > max){
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i] > max) {
                 maxSecond = max;
                 max = nums[i];
                 maxIndex = i;
-            } else if(nums[i] > maxSecond){
+            } else if (nums[i] > maxSecond) {
                 maxSecond = nums[i];
             }
         }
-        if(max >= 2*maxSecond){
+        if (max >= 2 * maxSecond) {
             return maxIndex;
         }
         return -1;
