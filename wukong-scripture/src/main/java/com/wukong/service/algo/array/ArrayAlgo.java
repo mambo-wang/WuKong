@@ -11,17 +11,47 @@ public class ArrayAlgo {
 //        System.out.println(removeDuplicates(new int[]{1,1,1,2,3,3,4}));
 //        char[] nums1 = new char[]{1,2,3,4,5,6,7};
 //        char[] nums2 = new char[]{1,2,3,4,6,7};
-
 //        rotate1(nums, 3);
 
 //        int[] res = retainAll(nums1, nums2);
 //        char c = find(nums1, nums2);
 //        System.out.println(c);
         /*****************************中心索引*******************************/
-        int[] nums1 = new int[]{1, 7, 3, 6, 5, 6};
-        int index = arrayAlgo.pivotIndex(nums1);
-        System.out.println(index);
+//        int[] nums1 = new int[]{1, 7, 3, 6, 5, 6};
+//        int index = arrayAlgo.pivotIndex(nums1);
+//        System.out.println(index);
+        /*****************************747. 至少是其他数字两倍的最大数*****************************************/
+        int[] nums2 = new int[]{ 3, 6, 1, 0};
+        int i = arrayAlgo.dominantIndex(nums2);
+        System.out.println(i);
 
+    }
+
+    /**
+     * 747. 至少是其他数字两倍的最大数
+     * 在一个给定的数组nums中，总是存在一个最大元素 。
+     * 查找数组中的最大元素是否至少是数组中每个其他数字的两倍。
+     * 如果是，则返回最大元素的索引，否则返回-1。
+     * @param nums
+     * @return
+     */
+    public int dominantIndex(int[] nums) {
+
+        int max=-1,maxIndex=-1,maxSecond=-1;
+
+        for (int i = 0; i < nums.length; i ++){
+            if(nums[i] > max){
+                maxSecond = max;
+                max = nums[i];
+                maxIndex = i;
+            } else if(nums[i] > maxSecond){
+                maxSecond = nums[i];
+            }
+        }
+        if(max >= 2*maxSecond){
+            return maxIndex;
+        }
+        return -1;
     }
 
     /**
