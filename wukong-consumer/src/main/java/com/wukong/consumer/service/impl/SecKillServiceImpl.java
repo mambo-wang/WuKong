@@ -14,12 +14,14 @@ import com.wukong.consumer.service.GoodsService;
 import com.wukong.consumer.service.SecKillService;
 import io.seata.core.context.RootContext;
 import io.seata.spring.annotation.GlobalTransactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 @Service("secKillService")
+@Slf4j
 public class SecKillServiceImpl implements SecKillService {
 
     @Autowired
@@ -67,7 +69,9 @@ public class SecKillServiceImpl implements SecKillService {
         int num = goodsService.reduceStock(goodsId);
 
         //创建订单
+        log.info("---before dubbo call order add method");
         BaseResult baseResult = dubboOrderService.addOrder(goodsVO, username);
+        log.info("---after dubbo call order add method");
 
         //支付（todo 半个小时期限，支付后修改订单状态，增加积分）
         BaseResult baseResult1 = dubboPayService.payMoney(goodsVO.getPrice(), username);

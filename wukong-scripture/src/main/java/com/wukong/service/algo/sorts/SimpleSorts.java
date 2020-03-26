@@ -46,12 +46,6 @@ public class SimpleSorts {
     }
   }
 
-  public  static void  selectionSort2(int[] a, int n) {
-    if(n < 1){
-      return;
-    }
-  }
-
   // 选择排序，a表示数组，n表示数组大小
   public static void selectionSort(int[] a, int n) {
     if (n <= 1) return;

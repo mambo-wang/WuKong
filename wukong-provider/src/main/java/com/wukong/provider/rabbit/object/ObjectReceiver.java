@@ -22,6 +22,7 @@ public class ObjectReceiver {
     @RabbitHandler
     public void process(AddScoreDTO addScoreDTO) {
         log.info("Receiver object : {}", addScoreDTO);
+
         userService.addScore(addScoreDTO);
     }
 

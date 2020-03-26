@@ -41,39 +41,31 @@ public class KafkaConsumers {
     @PostConstruct
     public void receiveWuKongMsg(){
         kafkaConsumer.subscribe(Arrays.asList("wukong"));
-        start(kafkaConsumer, "kafkaConsumer");
+        executors.execute(() -> start(kafkaConsumer, "kafkaConsumer"));
 
         secondaryKafkaConsumer.subscribe(Arrays.asList("wukong"));
-        start(secondaryKafkaConsumer, "secondaryKafkaConsumer");
+        executors.execute(() -> start(secondaryKafkaConsumer, "secondaryKafkaConsumer"));
     }
 
     public void start(KafkaConsumer consumer, String metadata) {
-
-        executors.submit(() -> {
-            // 鉴权认证
-            try {
-                while (true) {
-                    ConsumerRecords records = consumer.poll(Duration.ofSeconds(2));
-                    if (records != null && !records.isEmpty()) {
-                        log.info("----------------poll msg success from {} ------------------------", metadata);
-//                        TimeUnit.SECONDS.sleep(8);
-                        process(records);
-                        consumer.commitAsync();
-                    } else {
-                        TimeUnit.SECONDS.sleep(3);
-                    }
-                }
-            } catch (Throwable e) {
-                log.error("consumer exception", e);
-            } finally {
-                try {
-                    consumer.commitSync();
-                } finally {
-                    consumer.close();
+        try {
+            while (true) {
+                ConsumerRecords records = consumer.poll(Duration.ofSeconds(2));
+                if (records != null && !records.isEmpty()) {
+                    log.info("----------------poll msg success from {} ------------------------", metadata);
+                    process(records);
+                    consumer.commitAsync();
                 }
             }
-        });
-
+        } catch (Throwable e) {
+            log.error("consumer exception", e);
+        } finally {
+            try {
+                consumer.commitSync();
+            } finally {
+                consumer.close();
+            }
+        }
     }
 
 
