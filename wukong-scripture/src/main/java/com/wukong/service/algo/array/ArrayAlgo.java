@@ -40,8 +40,7 @@ public class ArrayAlgo {
      * leetCode 498 对角线
      * https://leetcode-cn.com/problems/diagonal-traverse/
      * 思路：
-     * 设置标志位，在遍历到边界处，改变标志位从而改变遍历方向
-     * 输入数组的起始位置与图中颠倒
+     * 设置标志位，在遍历到边界处，改变标志位从而改变遍历的方向
      * @param matrix
      * @return
      */
@@ -51,33 +50,34 @@ public class ArrayAlgo {
         }
         int arrLength = matrix.length * matrix[0].length;
         int[] resultArr = new int[arrLength]; //结果数组
-        int i = 0; //行索引
-        int j = 0; //列索引
+        //相当于一个原点在左上角的坐标系
+        int x = 0; //行索引
+        int y = 0; //列索引
         int index = 0;
         boolean direction = false; //true代表斜下，false代表斜上
         while (index <= arrLength - 1) {
-            resultArr[index++] = matrix[i][j];//将当前遍历数存入结果数组
+            resultArr[index++] = matrix[x][y];//将当前遍历数存入结果数组
             if (direction) {//斜下
-                if (i == matrix.length - 1) {
-                    j++;
+                if (x == matrix.length - 1) { //遍历到底边界，先判断该项，否则到矩阵顶点时会报数组越界
+                    y++;
                     direction = false;
-                } else if (j == 0) {
-                    i++;
+                } else if (y == 0) {//遍历到左边界
+                    x++;
                     direction = false;
                 } else {//正常情况
-                    j--;
-                    i++;
+                    y--;
+                    x++;
                 }
             } else {//斜上
-                if (j == matrix[0].length - 1) {
-                    i++;
+                if (y == matrix[0].length - 1) {//遍历到右边界，先判断该项，否则到矩阵顶点时会报数组越界
+                    x++;
                     direction = true;
-                } else if (i == 0) {
-                    j++;
+                } else if (x == 0) {//遍历到上边界
+                    y++;
                     direction = true;
                 } else {//正常情况
-                    j++;
-                    i--;
+                    y++;
+                    x--;
                 }
             }
         }
