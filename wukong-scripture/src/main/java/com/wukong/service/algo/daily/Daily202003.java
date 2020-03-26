@@ -30,7 +30,46 @@ public class Daily202003 {
         /******************************************************3.24按摩师************************************************************/
 //        System.out.println(daily202003.message(new int[]{2, 1, 4, 5, 3, 1, 1, 3}));
         /*******************************************************3.25表面积*********************************************************************/
-        System.out.println(daily202003.surfaceArea(new int[][]{{2,2,2},{2,1,2},{2,2,2}}));
+        System.out.println(daily202003.surfaceArea(new int[][]{{2, 2, 2}, {2, 1, 2}, {2, 2, 2}}));
+    }
+
+
+    /**
+     * leetcode 999 车的可用捕获量
+     * https://leetcode-cn.com/problems/available-captures-for-rook/solution/jian-dan-java100-by-sweetiee/
+     * @param board 棋盘
+     * @return
+     */
+    public int numRookCaptures(char[][] board) {
+        // 定义上下左右四个方向
+        int[] dx = {-1, 1, 0, 0};
+        int[] dy = {0, 0, -1, 1};
+
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                // 找到白车所在的位置
+                if (board[i][j] == 'R') {
+                    // 分别判断白车的上、下、左、右四个方向
+                    int res = 0;
+                    for (int k = 0; k < 4; k++) {
+                        int x = i, y = j;
+                        while (true) {
+                            x += dx[k];
+                            y += dy[k];
+                            if (x < 0 || x >= 8 || y < 0 || y >= 8 || board[x][y] == 'B') {
+                                break;
+                            }
+                            if (board[x][y] == 'p') {
+                                res++;
+                                break;
+                            }
+                        }
+                    }
+                    return res;
+                }
+            }
+        }
+        return 0;
     }
 
     /**
@@ -40,11 +79,12 @@ public class Daily202003 {
      * 每个值 v = grid[i][j] 表示 v 个正方体叠放在对应单元格 (i, j) 上。
      * 请你返回最终形体的表面积。
      * 链接：https://leetcode-cn.com/problems/surface-area-of-3d-shapes
-     *
+     * <p>
      * 题解：https://leetcode-cn.com/problems/surface-area-of-3d-shapes/solution/shi-li-you-tu-you-zhen-xiang-jiang-jie-yi-kan-jiu-/
      * 解题思路：
      * 首先，一个柱体一个柱体的看，每个柱体是由：2个底面（上表面/下表面）+ 所有的正方体都贡献了4个侧表面积。
      * 然后，把柱体贴合在一起之后，我们需要把贴合的表面积给减掉，两个柱体贴合的表面积就是 两个柱体高的最小值*2。
+     *
      * @param grid
      * @return
      */
