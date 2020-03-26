@@ -21,13 +21,67 @@ public class ArrayAlgo {
 //        int index = arrayAlgo.pivotIndex(nums1);
 //        System.out.println(index);
         /*****************************747. 至少是其他数字两倍的最大数*****************************************/
-        int[] nums2 = new int[]{3, 6, 1, 0};
+//        int[] nums2 = new int[]{3, 6, 1, 0};
 //        int i = arrayAlgo.dominantIndex(nums2);
 //        System.out.println(i);
         /*********************************66 加一**************************************************/
-        int[] res = arrayAlgo.plusOne(nums2);
+//        int[] res = arrayAlgo.plusOne(nums2);
+//        System.out.println();
+        /*************************************498对角线遍历***********************************************************/
+        int[][] arr = new int[][]{
+                {1, 2, 3},
+                {4, 5, 6},
+                {7, 8, 9}};
+        int [] res = arrayAlgo.findDiagonalOrder(arr);
         System.out.println();
+    }
 
+    /**
+     * leetCode 498 对角线
+     * https://leetcode-cn.com/problems/diagonal-traverse/
+     * 思路：
+     * 设置标志位，在遍历到边界处，改变标志位从而改变遍历方向
+     * 输入数组的起始位置与图中颠倒
+     * @param matrix
+     * @return
+     */
+    public int[] findDiagonalOrder(int[][] matrix) {
+        if (matrix.length == 0) {
+            return new int[0];
+        }
+        int arrLength = matrix.length * matrix[0].length;
+        int[] resultArr = new int[arrLength]; //结果数组
+        int i = 0; //行索引
+        int j = 0; //列索引
+        int index = 0;
+        boolean direction = false; //true代表斜下，false代表斜上
+        while (index <= arrLength - 1) {
+            resultArr[index++] = matrix[i][j];//将当前遍历数存入结果数组
+            if (direction) {//斜下
+                if (i == matrix.length - 1) {
+                    j++;
+                    direction = false;
+                } else if (j == 0) {
+                    i++;
+                    direction = false;
+                } else {//正常情况
+                    j--;
+                    i++;
+                }
+            } else {//斜上
+                if (j == matrix[0].length - 1) {
+                    i++;
+                    direction = true;
+                } else if (i == 0) {
+                    j++;
+                    direction = true;
+                } else {//正常情况
+                    j++;
+                    i--;
+                }
+            }
+        }
+        return resultArr;
     }
 
 
