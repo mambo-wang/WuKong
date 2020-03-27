@@ -30,13 +30,46 @@ public class Daily202003 {
         /******************************************************3.24按摩师************************************************************/
 //        System.out.println(daily202003.message(new int[]{2, 1, 4, 5, 3, 1, 1, 3}));
         /*******************************************************3.25表面积*********************************************************************/
-        System.out.println(daily202003.surfaceArea(new int[][]{{2, 2, 2}, {2, 1, 2}, {2, 2, 2}}));
+//        System.out.println(daily202003.surfaceArea(new int[][]{{2, 2, 2}, {2, 1, 2}, {2, 2, 2}}));
+        /***********************************************************3.27 卡牌分组   **/
+        System.out.println(daily202003.hasGroupsSizeX(new int[]{1,2,3,4,4,4,4,3,2,1}));
+    }
+
+    /**
+     * 3月27日 每日一题  914.卡牌分组
+     * 思路：求各个数字出现次数的最大公约数
+     * 题解：https://leetcode-cn.com/problems/x-of-a-kind-in-a-deck-of-cards/solution/3ms-jian-dan-java-fu-zeng-reducexie-fa-miao-dong-b/
+     * @param deck
+     * @return
+     */
+    public boolean hasGroupsSizeX(int[] deck) {
+        // 计数
+        int[] counter = new int[10000];
+        for (int num : deck) {
+            counter[num]++;
+        }
+        // 迭代求多个数的最大公约数
+        int x = 0;
+        for (int cnt : counter) {
+            if (cnt > 0) {
+                x = gcd(x, cnt);
+                if (x == 1) { // 如果某步中gcd是1，直接返回false
+                    return false;
+                }
+            }
+        }
+        return x >= 2;
+    }
+    // 辗转相除法
+    private int gcd(int a, int b) {
+        return b == 0 ? a : gcd(b, a % b);
     }
 
 
     /**
-     * leetcode 999 车的可用捕获量
+     * 3.26  leetcode 999 车的可用捕获量
      * https://leetcode-cn.com/problems/available-captures-for-rook/solution/jian-dan-java100-by-sweetiee/
+     *
      * @param board 棋盘
      * @return
      */
