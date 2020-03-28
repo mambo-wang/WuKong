@@ -5,38 +5,37 @@ public class Trie {
 
   // 往Trie树中插入一个字符串
   public void insert(char[] text) {
-    TrieNode p = root;
-    for (int i = 0; i < text.length; ++i) {
-      int index = text[i] - 'a';
-      if (p.children[index] == null) {
-        TrieNode newNode = new TrieNode(text[i]);
-        p.children[index] = newNode;
+    TrieNode thisRoot = root;
+    for (char c : text){
+      int index = c - 'a';
+      if(thisRoot.nodes[index] == null){
+        thisRoot.nodes[index] = new TrieNode(c);
       }
-      p = p.children[index];
+      thisRoot = thisRoot.nodes[index];
     }
-    p.isEndingChar = true;
+    thisRoot.isEnd = true;
   }
 
   // 在Trie树中查找一个字符串
   public boolean find(char[] pattern) {
-    TrieNode p = root;
-    for (int i = 0; i < pattern.length; ++i) {
-      int index = pattern[i] - 'a';
-      if (p.children[index] == null) {
-        return false; // 不存在pattern
+    TrieNode thisRoot = root;
+    for (char c : pattern){
+      int index = c - 'a';
+      if(thisRoot.nodes[index] == null){
+        return false;
       }
-      p = p.children[index];
+      thisRoot = thisRoot.nodes[index];
     }
-    if (p.isEndingChar == false) return false; // 不能完全匹配，只是前缀
-    else return true; // 找到pattern
+    return thisRoot.isEnd;
   }
 
   public class TrieNode {
     public char data;
-    public TrieNode[] children = new TrieNode[26];
-    public boolean isEndingChar = false;
-    public TrieNode(char data) {
-      this.data = data;
+    public boolean isEnd = false;
+    public TrieNode[] nodes = new TrieNode[26];
+
+    public TrieNode(char c){
+      this.data = c;
     }
   }
 }
