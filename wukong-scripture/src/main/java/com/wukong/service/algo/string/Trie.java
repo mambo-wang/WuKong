@@ -1,41 +1,56 @@
 package com.wukong.service.algo.string;
 
-public class Trie {
-  private TrieNode root = new TrieNode('/'); // 存储无意义字符
-
-  // 往Trie树中插入一个字符串
-  public void insert(char[] text) {
-    TrieNode thisRoot = root;
-    for (char c : text){
-      int index = c - 'a';
-      if(thisRoot.nodes[index] == null){
-        thisRoot.nodes[index] = new TrieNode(c);
-      }
-      thisRoot = thisRoot.nodes[index];
+/**
+ * leetCode 208. 实现 Trie (前缀树)
+ * https://leetcode-cn.com/problems/implement-trie-prefix-tree/
+ */
+class Trie {
+    TrieNode root;
+    /** Initialize your data structure here. */
+    public Trie() {
+        root = new TrieNode();
     }
-    thisRoot.isEnd = true;
-  }
-
-  // 在Trie树中查找一个字符串
-  public boolean find(char[] pattern) {
-    TrieNode thisRoot = root;
-    for (char c : pattern){
-      int index = c - 'a';
-      if(thisRoot.nodes[index] == null){
-        return false;
-      }
-      thisRoot = thisRoot.nodes[index];
+    /** Inserts a word into the trie. */
+    public void insert(String word) {
+        TrieNode thisRoot = root;
+        char[] chars = word.toCharArray();
+        for (char c : chars){
+            if(thisRoot.nodes[c - 'a'] == null){
+                thisRoot.nodes[c - 'a'] = new TrieNode();
+            }
+            thisRoot = thisRoot.nodes[c - 'a'];
+        }
+        thisRoot.isEnd = true;
     }
-    return thisRoot.isEnd;
-  }
-
-  public class TrieNode {
-    public char data;
-    public boolean isEnd = false;
-    public TrieNode[] nodes = new TrieNode[26];
-
-    public TrieNode(char c){
-      this.data = c;
+    /** Returns if the word is in the trie. */
+    public boolean search(String word) {
+        TrieNode thisRoot = root;
+        char[] chars = word.toCharArray();
+        for (char c : chars){
+            if(thisRoot.nodes[c - 'a'] == null){
+                return false;
+            }
+            thisRoot = thisRoot.nodes[c - 'a'];
+        }
+        return thisRoot.isEnd;
     }
-  }
+    
+    /** Returns if there is any word in the trie that starts with the given prefix. */
+    public boolean startsWith(String prefix) {
+        TrieNode thisRoot = root;
+        char[] chars = prefix.toCharArray();
+        for (char c : chars){
+            if(thisRoot.nodes[c - 'a'] == null){
+                return false;
+            }
+            thisRoot = thisRoot.nodes[c - 'a'];
+        }
+        return true;
+    }
+    class TrieNode{
+        public boolean isEnd = false;
+        public TrieNode[] nodes = new TrieNode[26];
+        public TrieNode(){
+        }
+    }
 }
