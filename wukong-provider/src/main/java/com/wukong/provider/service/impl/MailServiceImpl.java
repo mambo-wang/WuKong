@@ -1,5 +1,10 @@
 package com.wukong.provider.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
+import com.mysql.cj.xdevapi.JsonArray;
+import com.wukong.common.model.NewsBO;
+import com.wukong.common.utils.CrawlerTool;
+import com.wukong.common.utils.DateTimeTool;
 import com.wukong.provider.service.MailService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,11 +14,13 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.File;
+import java.util.List;
 
 /**
  * Created by summer on 2017/5/4.
@@ -28,6 +35,16 @@ public class MailServiceImpl implements MailService {
 
     @Value("${mail.fromMail.addr}")
     private String from;
+
+
+    @Scheduled(fixedRate = 10 * 60 * 1000)
+    public void publishNews(){
+        String url = "https://news.ifeng.com/";
+        List<NewsBO> newsBOList = CrawlerTool.jsoupList(url);
+        String title = "【悟空新闻】凤凰定时盘点" + DateTimeTool.formatFullDateTime(System.currentTimeMillis());
+        String content = JSONArray.toJSONString(newsBOList);
+        sendSimpleMail("mambo1991@163.com", title, content);
+    }
 
     /**
      * 发送文本邮件

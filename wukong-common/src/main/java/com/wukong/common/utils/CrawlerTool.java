@@ -1,5 +1,6 @@
 package com.wukong.common.utils;
 
+import com.wukong.common.model.NewsBO;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -10,12 +11,13 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class CrawlerBase {
+public class CrawlerTool {
     /**
      * 1、先介绍环境、前置条件
      * 2、jsoup 采集虎扑新闻列表、详情页
@@ -23,9 +25,9 @@ public class CrawlerBase {
      * @param args
      */
     public static void main(String[] args) {
-        String url = "https://voice.hupu.com/nba";
-        CrawlerBase crawlerBase = new CrawlerBase();
-        crawlerBase.jsoupList(url);
+        String url = "https://news.ifeng.com/";
+        CrawlerTool crawlerTool = new CrawlerTool();
+        crawlerTool.jsoupList(url);
 //        crawlerBase.httpClientList(url);
     }
 
@@ -33,25 +35,24 @@ public class CrawlerBase {
      * jsoup方式 获取虎扑新闻列表页
      * @param url 虎扑新闻列表页url
      */
-    public void jsoupList(String url){
+    public static List<NewsBO> jsoupList(String url){
+        List<NewsBO> newsBOS = new ArrayList<>();
         try {
             Document document = Jsoup.connect(url).get();
-            // 使用 css选择器 提取列表新闻 a 标签
-            // <a href="https://voice.hupu.com/nba/2484553.html" target="_blank">霍华德：夏休期内曾节食30天，这考验了我的身心</a>
-            Elements elements = document.select("div.news-list > ul > li > div.list-hd > h4 > a");
+            Elements elements = document.select("ul.news-stream-basic-news-list > li > a");
             for (Element element:elements){
-//                System.out.println(element);
                 // 获取详情页链接
-                String d_url = element.attr("href");
-                // 获取标题
-                String title = element.ownText();
-
-                System.out.println("详情页链接："+d_url+" ,详情页标题："+title);
-
+                String d_url = "http:" + element.attr("href");
+                String title1 = element.attr("title");
+                NewsBO newsBO = new NewsBO();
+                newsBO.setTitle(title1);
+                newsBO.setUrl(d_url);
+                newsBOS.add(newsBO);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return newsBOS;
     }
 
     /**
