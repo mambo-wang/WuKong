@@ -1,11 +1,12 @@
 package com.wukong.provider.service.impl;
 
 import com.alibaba.fastjson.JSONArray;
-import com.mysql.cj.xdevapi.JsonArray;
 import com.wukong.common.model.NewsBO;
 import com.wukong.common.utils.CrawlerTool;
 import com.wukong.common.utils.DateTimeTool;
 import com.wukong.provider.service.MailService;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,7 @@ import org.springframework.stereotype.Component;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.File;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by summer on 2017/5/4.
@@ -36,14 +37,34 @@ public class MailServiceImpl implements MailService {
     @Value("${mail.fromMail.addr}")
     private String from;
 
+    Queue<NewsBO> queue = new LinkedList<>();
 
     @Scheduled(fixedRate = 10 * 60 * 1000)
     public void publishNews(){
-        String url = "https://news.ifeng.com/";
-        List<NewsBO> newsBOList = CrawlerTool.jsoupList(url);
+        List<NewsBO> newsBOList = CrawlerTool.jsoupList();
+        Set<NewsBO> publish = new HashSet<>();
+        for (NewsBO newsBO : newsBOList){
+            if(queue.contains(newsBO)) {
+                continue;
+            } else {
+                if(!queue.isEmpty() && queue.size() > 50){
+                    queue.poll();
+                }
+                queue.offer(newsBO);
+                publish.add(newsBO);
+            }
+        }
         String title = "【悟空新闻】凤凰定时盘点" + DateTimeTool.formatFullDateTime(System.currentTimeMillis());
-        String content = JSONArray.toJSONString(newsBOList);
-        sendSimpleMail("mambo1991@163.com", title, content);
+        StringBuilder stringBuilder = new StringBuilder();
+        if(CollectionUtils.isNotEmpty(publish)){
+            for(NewsBO newsBO : publish){
+                stringBuilder.append(newsBO.getTitle()).append("\n")
+                        .append(newsBO.getUrl()).append("\n")
+                        .append(newsBO.getSource()).append("\n")
+                        .append(newsBO.getTime()).append("\n\n");
+            }
+            sendSimpleMail("mambo1991@163.com", title, stringBuilder.toString());
+        }
     }
 
     /**

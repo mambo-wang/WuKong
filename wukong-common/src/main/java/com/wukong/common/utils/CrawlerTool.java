@@ -18,35 +18,39 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class CrawlerTool {
-    /**
-     * 1、先介绍环境、前置条件
-     * 2、jsoup 采集虎扑新闻列表、详情页
-     * 3、httpclient 正则采集虎扑列表页
-     * @param args
-     */
+
     public static void main(String[] args) {
-        String url = "https://news.ifeng.com/";
-        CrawlerTool crawlerTool = new CrawlerTool();
-        crawlerTool.jsoupList(url);
-//        crawlerBase.httpClientList(url);
+
+        System.out.println(jsoupList());
     }
 
     /**
-     * jsoup方式 获取虎扑新闻列表页
-     * @param url 虎扑新闻列表页url
+     * jsoup方式 获取鳳凰新闻列表页
      */
-    public static List<NewsBO> jsoupList(String url){
+    public static List<NewsBO> jsoupList(){
+        String url = "https://news.ifeng.com/";
         List<NewsBO> newsBOS = new ArrayList<>();
         try {
             Document document = Jsoup.connect(url).get();
-            Elements elements = document.select("ul.news-stream-basic-news-list > li > a");
+            Elements elements = document.select("ul.news-stream-basic-news-list > li");
             for (Element element:elements){
+
+                Elements titleElement = element.select("a");
                 // 获取详情页链接
-                String d_url = "http:" + element.attr("href");
-                String title1 = element.attr("title");
+                String d_url = "http:" + titleElement.attr("href");
+                String title1 = titleElement.attr("title");
+
+                Elements timeElements = element.select("div.news-stream-newsStream-news-item-infor > div.clearfix > time");
+                String time = timeElements.text();
+
+                Elements srcElements = element.select("div.news-stream-newsStream-news-item-infor > div.clearfix > span");
+                String src = srcElements.text();
+
                 NewsBO newsBO = new NewsBO();
                 newsBO.setTitle(title1);
                 newsBO.setUrl(d_url);
+                newsBO.setTime(time);
+                newsBO.setSource(src);
                 newsBOS.add(newsBO);
             }
         } catch (IOException e) {
@@ -57,9 +61,9 @@ public class CrawlerTool {
 
     /**
      * httpclient + 正则表达式 获取虎扑新闻列表页
-     * @param url 虎扑新闻列表页url
      */
-    public void httpClientList(String url){
+    public void httpClientList(){
+        String url = "https://ncov.dxy.cn/ncovh5/view/pneumonia?from=timeline&isappinstalled=0";
         try {
             CloseableHttpClient httpclient = HttpClients.createDefault();
             HttpGet httpGet = new HttpGet(url);
