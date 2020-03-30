@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -22,18 +23,27 @@ public class ObjectReceiver {
     @Autowired
     private OrderService orderService;
 
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
     @RabbitHandler
     public void process(PayDTO payDTO) {
         log.info("Receiver object : {}", payDTO);
 
         //step 1 pay  todo 付款方法
         boolean res = false;
-        //step 2 update order state
         if(res){
+            //step 2 update order state
             orderService.updateState(payDTO.getUsername(), payDTO.getGoodsId(), Constant.Order.STAT_PAY);
             //step 3 add score
             userService.addScore(payDTO);
+
+            //真正减库存 todo dubbo调用
+
         } else {
+            //加库存
+            stringRedisTemplate.opsForHash().increment(Constant.RedisKey.KEY_STOCK, payDTO.getGoodsId().toString(), 1);
+            //订单状态修改
             orderService.updateState(payDTO.getUsername(), payDTO.getGoodsId(), Constant.Order.STAT_CANCEL);
         }
 

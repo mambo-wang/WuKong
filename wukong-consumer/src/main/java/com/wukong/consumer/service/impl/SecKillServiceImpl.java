@@ -65,15 +65,12 @@ public class SecKillServiceImpl implements SecKillService {
         //预减库存，操作redis
         stringRedisTemplate.opsForHash().increment(Constant.RedisKey.KEY_STOCK, goodsId.toString(), -1);
 
-        //减库存，操作数据库  todo 秒杀结束后统一入库（quartz定时任务）
-        int num = goodsService.reduceStock(goodsId);
-
         //创建订单，dubbo调用，操作数据库
         HashOperations<String, String, String> hashOperations = stringRedisTemplate.opsForHash();
         GoodsVO goodsVO = JSONObject.parseObject(hashOperations.get(Constant.RedisKey.KEY_GOODS, goodsId.toString()), GoodsVO.class);
         BaseResult baseResult = dubboOrderService.addOrder(goodsVO, username);
 
-        if(num <= 0 || baseResult.getType() < 0){
+        if(baseResult.getType() < 0){
             throw new BusinessException("500","秒杀失败");
         }
 
