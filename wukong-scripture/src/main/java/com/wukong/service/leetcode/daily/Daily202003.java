@@ -14,17 +14,8 @@ public class Daily202003 {
         /**************************************************3.22****************************************************************/
 //        System.out.println(daily202003.minIncrementForUniq(new int[]{3, 2, 1, 2, 1, 7}));
         /*****************************************3.23求链表中间节点**************************************************/
-//        ListNode listNode1 = new ListNode(1);
-//        ListNode listNode2 = new ListNode(2);
-//        ListNode listNode3 = new ListNode(3);
-//        ListNode listNode4 = new ListNode(4);
-//        ListNode listNode5 = new ListNode(5);
-//        ListNode listNode6 = new ListNode(6);
-//        listNode1.next = listNode2;
-//        listNode2.next = listNode3;
-//        listNode3.next = listNode4;
-//        listNode4.next = listNode5;
-//        listNode5.next = listNode6;
+//        ListNode listNode1 = new ListNode(1),listNode2 = new ListNode(2),listNode3 = new ListNode(3),listNode4 = new ListNode(4),listNode5 = new ListNode(5),listNode6 = new ListNode(6);
+//        listNode1.next = listNode2;listNode2.next = listNode3;listNode3.next = listNode4;listNode4.next = listNode5;listNode5.next = listNode6;
 //        ListNode listNode = daily202003.middleNode(listNode1);
 //        System.out.println(listNode.val);
         /******************************************************3.24按摩师************************************************************/
@@ -36,7 +27,31 @@ public class Daily202003 {
         /*****************************************************3.28 Trie树 字符串压缩**********************************************************************/
 //        System.out.println(daily202003.minimumLengthEncoding(new String[]{"time", "me", "bell"}));
         /***************************************3.29 地图分析  图的bfs***************************************************/
-        System.out.println(daily202003.maxDistance(new int[][]{{1, 0, 0}, {0, 0, 0}, {0, 0, 0}}));
+//        System.out.println(daily202003.maxDistance(new int[][]{{1, 0, 0}, {0, 0, 0}, {0, 0, 0}}));
+        /*******************************************************3.30 面试题62. 圆圈中最后剩下的数字**************************************************************************/
+        System.out.println(daily202003.lastRemaining(5,3));
+    }
+
+    /**
+     * leetcode每日一题  3月30日
+     * 面试题62. 圆圈中最后剩下的数字  约瑟夫环问题
+     * https://leetcode-cn.com/problems/yuan-quan-zhong-zui-hou-sheng-xia-de-shu-zi-lcof/solution/javajie-jue-yue-se-fu-huan-wen-ti-gao-su-ni-wei-sh/
+     */
+    public int lastRemaining(int n, int m){
+        ArrayList<Integer> list = new ArrayList<>();
+        for (int i = 0; i < n; i ++){
+            list.add(i);
+        }
+
+        int idx = 0;
+        while (n > 1){
+            //假设当前删除的位置是 idx ,下一个删除的数字的位置是 idx + m 。但是，由于把当前位置的数字删除了，后面的数字会前移一位，
+            // 所以实际的下一个位置是 idx + m −1。由于数到末尾会从头继续数，所以最后取模一下，就是 (idx + m - 1) (mod n)。
+            idx = (idx + m - 1) % n;
+            list.remove(idx);
+            n --;
+        }
+        return list.get(0);
     }
 
 
