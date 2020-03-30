@@ -9,9 +9,11 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AddScoreDTO implements Serializable {
+public class PayDTO implements Serializable {
     private static final long serialVersionUID = -4640517863417723452L;
     private String username;
 
-    private int scoreToAdd;
+    private Long goodsId;
+
+    private Double price;
 }

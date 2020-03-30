@@ -28,5 +28,6 @@ public interface Constant {
         int STAT_RECEIVED = 3;
         int STAT_BACK = 4;
         int STAT_DONE = 5;
+        int STAT_CANCEL = 6;
     }
 }

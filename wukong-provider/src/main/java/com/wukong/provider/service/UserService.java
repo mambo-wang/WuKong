@@ -1,6 +1,6 @@
 package com.wukong.provider.service;
 
-import com.wukong.common.model.AddScoreDTO;
+import com.wukong.common.model.PayDTO;
 import com.wukong.common.model.UserVO;
 import com.wukong.provider.controller.vo.LoginVO;
 import com.wukong.provider.controller.vo.UserImportVO;
@@ -30,7 +30,7 @@ public interface UserService {
 
     UserVO getByToken(HttpServletResponse response, String token);
 
-    void addScore(AddScoreDTO addScoreDTO);
+    void addScore(PayDTO payDTO);
 
     Workbook createExcelTemplate();
 

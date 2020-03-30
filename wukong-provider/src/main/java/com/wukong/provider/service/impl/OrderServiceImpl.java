@@ -52,4 +52,9 @@ public class OrderServiceImpl implements OrderService {
         }
         return num;
     }
+
+    @Override
+    public void updateState(String username, Long goodsId, Integer state) {
+        //todo 找到订单，修改状态
+    }
 }

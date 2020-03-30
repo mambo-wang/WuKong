@@ -3,9 +3,8 @@ package com.wukong.consumer.service.impl;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.fastjson.JSONObject;
 import com.wukong.common.dubbo.DubboOrderService;
-import com.wukong.common.dubbo.DubboPayService;
 import com.wukong.common.exception.BusinessException;
-import com.wukong.common.model.AddScoreDTO;
+import com.wukong.common.model.PayDTO;
 import com.wukong.common.model.BaseResult;
 import com.wukong.common.model.GoodsVO;
 import com.wukong.common.contants.Constant;
@@ -32,9 +31,6 @@ public class SecKillServiceImpl implements SecKillService {
     @Reference(timeout=10000, retries=2)
     private DubboOrderService dubboOrderService;
 
-    @Reference(timeout=10000, retries=2)
-    private DubboPayService dubboPayService;
-
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
 
@@ -42,7 +38,8 @@ public class SecKillServiceImpl implements SecKillService {
     private ObjectSender objectSender;
 
     /**
-     * seata分布式事务秒杀接口
+     * seata at 分布式事务秒杀接口
+     * todo tcc：锁定库存--减库存--失败加库存  创建订单--创建订单--删除订单
      * @param goodsId
      * @param username
      */
@@ -68,27 +65,20 @@ public class SecKillServiceImpl implements SecKillService {
         //预减库存，操作redis
         stringRedisTemplate.opsForHash().increment(Constant.RedisKey.KEY_STOCK, goodsId.toString(), -1);
 
-        //查询商品详情,操作redis
-        HashOperations<String, String, String> hashOperations = stringRedisTemplate.opsForHash();
-        GoodsVO goodsVO = JSONObject.parseObject(hashOperations.get(Constant.RedisKey.KEY_GOODS, goodsId.toString()), GoodsVO.class);
-
         //减库存，操作数据库  todo 秒杀结束后统一入库（quartz定时任务）
         int num = goodsService.reduceStock(goodsId);
 
         //创建订单，dubbo调用，操作数据库
-        log.info("---before dubbo call order add method");
+        HashOperations<String, String, String> hashOperations = stringRedisTemplate.opsForHash();
+        GoodsVO goodsVO = JSONObject.parseObject(hashOperations.get(Constant.RedisKey.KEY_GOODS, goodsId.toString()), GoodsVO.class);
         BaseResult baseResult = dubboOrderService.addOrder(goodsVO, username);
-        log.info("---after dubbo call order add method");
 
-        //支付（todo 半个小时期限，支付后修改订单状态）
-        BaseResult baseResult1 = dubboPayService.payMoney(goodsVO.getPrice(), username);
-
-        if(num <= 0 || baseResult.getType() < 0 || baseResult1.getType() < 0){
+        if(num <= 0 || baseResult.getType() < 0){
             throw new BusinessException("500","秒杀失败");
         }
 
-        //增加积分
-        objectSender.send(new AddScoreDTO(username, goodsVO.getPrice().intValue()));
+        //付款，修改订单状态、增加积分
+        objectSender.send(new PayDTO(username, goodsVO.getId(), goodsVO.getPrice()));
 
     }
 

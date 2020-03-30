@@ -3,9 +3,8 @@ package com.wukong.provider.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.wukong.common.contants.Constant;
 import com.wukong.common.exception.BusinessException;
-import com.wukong.common.model.AddScoreDTO;
+import com.wukong.common.model.PayDTO;
 import com.wukong.common.model.UserVO;
-import com.wukong.common.utils.DateTimeTool;
 import com.wukong.common.utils.ExcelTool;
 import com.wukong.provider.controller.vo.LoginVO;
 import com.wukong.provider.controller.vo.UserImportVO;
@@ -121,16 +120,16 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public void addScore(AddScoreDTO addScoreDTO) {
-        User user = userMapper.selectByUsername(addScoreDTO.getUsername());
+    public void addScore(PayDTO payDTO) {
+        User user = userMapper.selectByUsername(payDTO.getUsername());
         log.info("------add score method invoke {}", System.currentTimeMillis());
-        user.setScore(user.getScore() + addScoreDTO.getScoreToAdd());
+        user.setScore(user.getScore() + payDTO.getPrice().intValue());
         log.info("------before db method invoke {}", System.currentTimeMillis());
         userMapper.updateByPrimaryKey(user);
         log.info("------after db method invoke {}", System.currentTimeMillis());
 
-        mailService.sendSimpleMail("mambo1991@163.com", "【悟空秒杀】积分增加通知","亲爱的" + addScoreDTO.getUsername() + "恭喜您下单成功，"
-                +addScoreDTO.getScoreToAdd()+"积分已到账,目前共有积分" + user.getScore()+"\n--悟空商城");
+        mailService.sendSimpleMail("mambo1991@163.com", "【悟空秒杀】积分增加通知","亲爱的" + payDTO.getUsername() + "恭喜您下单成功，"
+                + payDTO.getPrice()+"积分已到账,目前共有积分" + user.getScore()+"\n--悟空商城");
     }
 
     @Override
