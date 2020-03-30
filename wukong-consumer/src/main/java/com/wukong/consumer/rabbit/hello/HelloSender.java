@@ -28,7 +28,7 @@ public class HelloSender {
 	 * 延迟消息
 	 * @param payDTO
 	 */
-	public void sendDeadLetter(String payDTO, long seconds){
+	public void sendDeadLetter(PayDTO payDTO, long seconds){
 		this.rabbitTemplate.convertAndSend(DelayConfig.EXCHANGE_DELAY, DelayConfig.ROUTINGKEY_DELAY, payDTO, message -> {
 			message.getMessageProperties().setHeader(AbstractJavaTypeMapper.DEFAULT_CONTENT_CLASSID_FIELD_NAME, String.class.getName());
 			message.getMessageProperties().setExpiration(seconds * 1000 + "");

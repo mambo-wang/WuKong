@@ -83,7 +83,7 @@ public class SecKillServiceImpl implements SecKillService {
         objectSender.send(payDTO);
 
         //超时未付款释放库存
-        helloSender.sendDeadLetter(JSONObject.toJSONString(payDTO), TimeUnit.MINUTES.toSeconds(1));
+        helloSender.sendDeadLetter(payDTO, TimeUnit.MINUTES.toSeconds(1));
 
     }
 

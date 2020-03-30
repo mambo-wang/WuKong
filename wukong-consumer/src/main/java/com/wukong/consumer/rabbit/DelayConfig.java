@@ -22,8 +22,8 @@ public class DelayConfig {
     @Bean
     public Queue delayProcessQueue(){
         Map<String, Object> params = new HashMap<>();
-        params.put("x-dead-letter-exchange", "topicExchange");
-        params.put("x-dead-letter-routing-key", "topic.message");
+        params.put("x-dead-letter-exchange", EXCHANGE_DELAY_TIMED);
+        params.put("x-dead-letter-routing-key", ROUTINGKEY_DELAY_TIMED);
         return new Queue(QUEUE_DELAY, true, false, true, params);
     }
 
