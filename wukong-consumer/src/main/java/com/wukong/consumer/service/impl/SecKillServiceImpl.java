@@ -20,6 +20,8 @@ import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.TimeUnit;
+
 @Service("secKillService")
 @Slf4j
 public class SecKillServiceImpl implements SecKillService {
@@ -49,13 +51,18 @@ public class SecKillServiceImpl implements SecKillService {
     public void secKill(Long goodsId, String username) {
 
         System.out.println("开始全局事务，XID = " + RootContext.getXID());
+
         //检查是否已经买过了（秒杀场景每人限量一份商品），下单后会写入redis ，此处读取redis
+        boolean res = stringRedisTemplate.opsForValue().setIfAbsent("miaosha:" + goodsId  + ":" +username, username, 5, TimeUnit.MINUTES);
+        if(!res){
+            throw new BusinessException("500","不允许重复下单");
+        }
 
         //检查是否还有库存,读取redis
         HashOperations<String, String, String> hashOperations1 = stringRedisTemplate.opsForHash();
         Integer stock = Integer.valueOf(hashOperations1.get(Constant.RedisKey.KEY_STOCK, goodsId.toString()));
         if(stock <= 0){
-            throw new BusinessException("500","寿光");
+            throw new BusinessException("500","商品已售罄");
         }
 
         //预减库存，操作redis
@@ -65,15 +72,15 @@ public class SecKillServiceImpl implements SecKillService {
         HashOperations<String, String, String> hashOperations = stringRedisTemplate.opsForHash();
         GoodsVO goodsVO = JSONObject.parseObject(hashOperations.get(Constant.RedisKey.KEY_GOODS, goodsId.toString()), GoodsVO.class);
 
-        //减库存
+        //减库存，操作数据库  todo 秒杀结束后统一入库（quartz定时任务）
         int num = goodsService.reduceStock(goodsId);
 
-        //创建订单
+        //创建订单，dubbo调用，操作数据库
         log.info("---before dubbo call order add method");
         BaseResult baseResult = dubboOrderService.addOrder(goodsVO, username);
         log.info("---after dubbo call order add method");
 
-        //支付（todo 半个小时期限，支付后修改订单状态，增加积分）
+        //支付（todo 半个小时期限，支付后修改订单状态）
         BaseResult baseResult1 = dubboPayService.payMoney(goodsVO.getPrice(), username);
 
         if(num <= 0 || baseResult.getType() < 0 || baseResult1.getType() < 0){
