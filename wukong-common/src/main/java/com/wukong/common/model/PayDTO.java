@@ -16,4 +16,6 @@ public class PayDTO implements Serializable {
     private Long goodsId;
 
     private Double price;
+
+    private Long orderId;
 }

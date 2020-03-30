@@ -8,6 +8,7 @@ import com.wukong.common.model.PayDTO;
 import com.wukong.common.model.BaseResult;
 import com.wukong.common.model.GoodsVO;
 import com.wukong.common.contants.Constant;
+import com.wukong.consumer.rabbit.hello.HelloSender;
 import com.wukong.consumer.rabbit.object.ObjectSender;
 import com.wukong.consumer.service.GoodsService;
 import com.wukong.consumer.service.SecKillService;
@@ -36,6 +37,9 @@ public class SecKillServiceImpl implements SecKillService {
 
     @Autowired
     private ObjectSender objectSender;
+
+    @Autowired
+    private HelloSender helloSender;
 
     /**
      * seata at 分布式事务秒杀接口
@@ -68,14 +72,18 @@ public class SecKillServiceImpl implements SecKillService {
         //创建订单，dubbo调用，操作数据库
         HashOperations<String, String, String> hashOperations = stringRedisTemplate.opsForHash();
         GoodsVO goodsVO = JSONObject.parseObject(hashOperations.get(Constant.RedisKey.KEY_GOODS, goodsId.toString()), GoodsVO.class);
-        BaseResult baseResult = dubboOrderService.addOrder(goodsVO, username);
+        BaseResult<Long> baseResult = dubboOrderService.addOrder(goodsVO, username);
 
         if(baseResult.getType() < 0){
             throw new BusinessException("500","秒杀失败");
         }
 
+        PayDTO payDTO = new PayDTO(username, goodsVO.getId(), goodsVO.getPrice(), baseResult.getData());
         //付款，修改订单状态、增加积分
-        objectSender.send(new PayDTO(username, goodsVO.getId(), goodsVO.getPrice()));
+        objectSender.send(payDTO);
+
+        //超时未付款释放库存
+        helloSender.sendDeadLetter(JSONObject.toJSONString(payDTO), TimeUnit.MINUTES.toSeconds(1));
 
     }
 

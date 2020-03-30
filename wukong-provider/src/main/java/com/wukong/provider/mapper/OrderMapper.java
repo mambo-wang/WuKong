@@ -28,9 +28,9 @@ public interface OrderMapper {
         "#{payDate,jdbcType=TIMESTAMP})"
     })
     @Options(useGeneratedKeys=true,keyProperty="id")
-    int insert(Order record);
+    Long insert(Order record);//todo 返回Id
 
-    int insertSelective(Order record);
+    Long insertSelective(Order record);
 
     @Select({
         "select",

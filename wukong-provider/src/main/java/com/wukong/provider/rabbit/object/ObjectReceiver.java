@@ -34,17 +34,18 @@ public class ObjectReceiver {
         boolean res = false;
         if(res){
             //step 2 update order state
-            orderService.updateState(payDTO.getUsername(), payDTO.getGoodsId(), Constant.Order.STAT_PAY);
+            orderService.updateState(payDTO, Constant.Order.STAT_PAY);
             //step 3 add score
             userService.addScore(payDTO);
 
             //真正减库存 todo dubbo调用
 
+
         } else {
             //加库存
             stringRedisTemplate.opsForHash().increment(Constant.RedisKey.KEY_STOCK, payDTO.getGoodsId().toString(), 1);
             //订单状态修改
-            orderService.updateState(payDTO.getUsername(), payDTO.getGoodsId(), Constant.Order.STAT_CANCEL);
+            orderService.updateState(payDTO, Constant.Order.STAT_CANCEL);
         }
 
     }

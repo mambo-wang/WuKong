@@ -1,10 +1,11 @@
 package com.wukong.provider.service;
 
 import com.wukong.common.model.GoodsVO;
+import com.wukong.common.model.PayDTO;
 
 public interface OrderService {
 
-    int createOrder(GoodsVO goodsVO, String username);
+    Long createOrder(GoodsVO goodsVO, String username);
 
-    void updateState(String username, Long goodsId, Integer state);
+    boolean updateState(PayDTO payDTO, Integer state);
 }

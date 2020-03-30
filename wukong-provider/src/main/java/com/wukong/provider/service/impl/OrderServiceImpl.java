@@ -1,6 +1,7 @@
 package com.wukong.provider.service.impl;
 
 import com.wukong.common.model.GoodsVO;
+import com.wukong.common.model.PayDTO;
 import com.wukong.common.model.UserVO;
 import com.wukong.common.contants.Constant;
 import com.wukong.provider.entity.Order;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Objects;
 
 @Service("orderService")
 @Slf4j
@@ -30,7 +32,7 @@ public class OrderServiceImpl implements OrderService {
     private UserService userService;
 
     @Override
-    public int createOrder(GoodsVO goodsVO, String username) {
+    public Long createOrder(GoodsVO goodsVO, String username) {
         log.info("add order");
         UserVO userVO = userService.findByUsername(username);
         Order order = new Order();
@@ -43,8 +45,7 @@ public class OrderServiceImpl implements OrderService {
         order.setGoodsPrice(BigDecimal.valueOf(goodsVO.getPrice()));
         order.setStatus(Constant.Order.STAT_NOT_PAY);
         order.setPayDate(new Date());
-        int num = orderMapper.insert(order);
-        //todo
+        Long num = orderMapper.insert(order);//todo 拿到刚刚插入的id
         if(redisTemplate.hasKey(Constant.RedisKey.KEY_SALES)){
             redisTemplate.opsForHash().increment(Constant.RedisKey.KEY_SALES, goodsVO.getId().toString(), 1);
         } else {
@@ -54,7 +55,13 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void updateState(String username, Long goodsId, Integer state) {
-        //todo 找到订单，修改状态
+    public boolean updateState(PayDTO payDTO, Integer state) {
+        Order order = orderMapper.selectByPrimaryKey(payDTO.getOrderId());
+        if(Objects.isNull(order)){
+            return false;
+        }
+        order.setStatus(state);
+        orderMapper.updateByPrimaryKey(order);
+        return true;
     }
 }

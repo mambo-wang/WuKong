@@ -3,6 +3,7 @@ package com.wukong.consumer.controller;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.wukong.common.dubbo.DubboService;
 import com.wukong.common.model.BaseResult;
+import com.wukong.common.model.PayDTO;
 import com.wukong.common.model.UserVO;
 import com.wukong.consumer.rabbit.fanout.FanoutSender;
 import com.wukong.consumer.rabbit.hello.HelloSender;
@@ -48,7 +49,7 @@ public class HelloController {
      * @return
      */
     @GetMapping(value = "/rmq")
-    public BaseResult rmq(@RequestParam(name = "seconds")int seconds, @RequestParam(name = "username") String username) {
+    public BaseResult rmq(@RequestParam(name = "seconds")long seconds, @RequestParam(name = "username") String username) {
         fanoutSender.send();
         helloSender.send();
         neoSender.send(1);
@@ -56,7 +57,6 @@ public class HelloController {
         topicSender.send();
         topicSender.send1();
         topicSender.send2();
-        helloSender.sendDeadLetter("dead letter", seconds);
         return BaseResult.success(null);
     }
 

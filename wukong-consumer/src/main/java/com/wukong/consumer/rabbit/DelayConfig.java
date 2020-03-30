@@ -1,20 +1,8 @@
 package com.wukong.consumer.rabbit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.*;
-import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
-import org.springframework.amqp.rabbit.connection.ConnectionFactory;
-import org.springframework.amqp.rabbit.connection.CorrelationData;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
-import org.springframework.amqp.rabbit.listener.api.ChannelAwareMessageListener;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
-
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,7 +14,9 @@ public class DelayConfig {
     public static final String QUEUE_DELAY = "queue.delay.wukong";
     public static final String ROUTINGKEY_DELAY = "routing.delay.wukong";
 
-
+    public static final String ROUTINGKEY_DELAY_TIMED = "routing.delay.timed";
+    public static final String QUEUE_DELAY_TIMED = "queue.delay.timed";
+    public static final String EXCHANGE_DELAY_TIMED = "exchange.delay.timed";
 
     /**延迟队列配置*/
     @Bean
@@ -35,7 +25,6 @@ public class DelayConfig {
         params.put("x-dead-letter-exchange", "topicExchange");
         params.put("x-dead-letter-routing-key", "topic.message");
         return new Queue(QUEUE_DELAY, true, false, true, params);
-
     }
 
     @Bean
@@ -48,5 +37,16 @@ public class DelayConfig {
         return BindingBuilder.bind(delayProcessQueue()).to(delayExchange()).with(ROUTINGKEY_DELAY);
     }
 
-
+    @Bean
+    public Queue queueDelayTimed() {
+        return new Queue(QUEUE_DELAY_TIMED);
+    }
+    @Bean
+    TopicExchange exchangeDelayTimed() {
+        return new TopicExchange(EXCHANGE_DELAY_TIMED);
+    }
+    @Bean
+    Binding bingDelayTimed(Queue queueDelayTimed, TopicExchange exchangeDelayTimed) {
+        return BindingBuilder.bind(queueDelayTimed).to(exchangeDelayTimed).with(ROUTINGKEY_DELAY_TIMED);
+    }
 }
