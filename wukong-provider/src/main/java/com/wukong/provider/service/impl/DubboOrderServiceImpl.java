@@ -9,6 +9,8 @@ import io.seata.core.context.RootContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
+
 @Service(retries=2)
 @Component
 public class DubboOrderServiceImpl implements DubboOrderService {
@@ -22,7 +24,7 @@ public class DubboOrderServiceImpl implements DubboOrderService {
 
         System.out.println("全局事务id ：" + RootContext.getXID());
         Long num = orderService.createOrder(goodsVO, username);
-        if(num > 0){
+        if(Objects.nonNull(num)){
             return BaseResult.success(num);
         } else {
             return BaseResult.fail("500", "添加订单失败");
