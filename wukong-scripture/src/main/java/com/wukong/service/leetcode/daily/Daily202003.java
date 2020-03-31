@@ -29,7 +29,42 @@ public class Daily202003 {
         /***************************************3.29 地图分析  图的bfs***************************************************/
 //        System.out.println(daily202003.maxDistance(new int[][]{{1, 0, 0}, {0, 0, 0}, {0, 0, 0}}));
         /*******************************************************3.30 面试题62. 圆圈中最后剩下的数字**************************************************************************/
-        System.out.println(daily202003.lastRemaining(5,3));
+//        System.out.println(daily202003.lastRemaining(5,3));
+        /*****************************************************3.31 计数排序************************************************************/
+        System.out.println(Arrays.toString(daily202003.sortArray(new int[]{1,2,3,4,4,4,4,3,2,1})));
+    }
+
+    /** leetCode每日一题 3月31日 912. 排序数组
+     *  链接：https://leetcode-cn.com/problems/sort-an-array/solution/dang-wo-tan-pai-xu-shi-wo-zai-tan-xie-shi-yao-by-s/
+     *  数据范围：
+     *  1 <= nums.length <= 50000
+     * -50000 <= nums[i] <= 50000
+     *  解题思路：这道题用非比较排序的计数排序会略微快一丢丢滴，因为这道题元素的数据范围很小。
+     * @param nums
+     * @return
+     */
+    public int[] sortArray(int[] nums){
+        int max = -50001, min = 50001;
+        for (int num: nums) {
+            max = Math.max(num, max);
+            min = Math.min(num, min);
+        }
+
+        //桶，索引原数组值与最小值得差，值为相同数字的出现次数
+        int[] counter = new int[max - min + 1];
+        for (int num: nums) {
+            counter[num - min]++;
+        }
+
+        int idx = 0;
+        for (int num = min; num <= max; num++) {
+            //该数值num出现次数
+            int cnt = counter[num - min];
+            while (cnt-- > 0) {
+                nums[idx++] = num;//添加对应次数的值
+            }
+        }
+        return nums;
     }
 
     /**
