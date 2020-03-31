@@ -18,9 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class HelloController {
-
-    @Reference
-    private DubboService dubboService;
     @Autowired
     private FanoutSender fanoutSender;
     @Autowired
@@ -33,16 +30,6 @@ public class HelloController {
     private ObjectSender objectSender;
     @Autowired
     private TopicSender topicSender;
-
-    /**
-     * 测试dubbo
-     * @return
-     */
-    @GetMapping(value = "/user")
-    public BaseResult user(@RequestParam(name = "username")String username) {
-        UserVO hello = dubboService.getUser(username);
-        return BaseResult.success(hello);
-    }
 
     /**
      * 测试rmq

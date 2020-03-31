@@ -46,6 +46,13 @@ public class SecKillController {
         return BaseResult.success(null);
     }
 
+    @ApiOperation(value = "查询秒杀结果")
+    @GetMapping("/result")
+    public BaseResult result(@RequestParam(name = "goodsId")Long goodsId, @RequestParam(name = "username")String username){
+        String result = secKillService.querySecKillResult(goodsId, username);
+        return BaseResult.success(result);
+    }
+
     @ApiOperation(value = "导出商品清单")
     @GetMapping("/export")
     public BaseResult exportGoods(HttpServletResponse response, HttpServletRequest request) throws NoSuchFieldException, IllegalAccessException, IOException {

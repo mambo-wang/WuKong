@@ -30,9 +30,6 @@ public class SecKillServiceImpl implements SecKillService {
     @Autowired
     private GoodsService goodsService;
 
-    @Reference(timeout=10000, retries=2)
-    private DubboOrderService dubboOrderService;
-
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
 
@@ -56,6 +53,12 @@ public class SecKillServiceImpl implements SecKillService {
 
         System.out.println("开始全局事务，XID = " + RootContext.getXID());
 
+        HashOperations<String, String, String> hashOperations = stringRedisTemplate.opsForHash();
+        GoodsVO goodsVO = JSONObject.parseObject(hashOperations.get(Constant.RedisKey.KEY_GOODS, goodsId.toString()), GoodsVO.class);
+        if(goodsVO == null){
+            throw new BusinessException("500","该商品秒杀已结束");
+        }
+
         //检查是否已经买过了（秒杀场景每人限量一份商品），下单后会写入redis ，此处读取redis
         boolean res = stringRedisTemplate.opsForValue().setIfAbsent("miaosha:" + goodsId  + ":" +username, username, 5, TimeUnit.MINUTES);
         if(!res){
@@ -74,14 +77,21 @@ public class SecKillServiceImpl implements SecKillService {
 
         //snowflake算法创建orderId
         Long orderId = snowFlake.nextId();
-        HashOperations<String, String, String> hashOperations = stringRedisTemplate.opsForHash();
-        GoodsVO goodsVO = JSONObject.parseObject(hashOperations.get(Constant.RedisKey.KEY_GOODS, goodsId.toString()), GoodsVO.class);
 
         PayDTO payDTO = new PayDTO(username, goodsVO, orderId);
         //创建订单、付款，修改订单状态、增加积分
         objectSender.send(payDTO);
         //超时未付款（检验订单状态）释放库存
         helloSender.sendDeadLetter(payDTO, TimeUnit.MINUTES.toSeconds(1));
+        //结果
+        stringRedisTemplate.opsForHash().put(Constant.RedisKey.KEY_KILL_RESULT, String.format(Constant.RedisKey.KEY_RESULT_KEY, payDTO.getUsername(), goodsId), Constant.SecKill.processing);
+
+    }
+
+    @Override
+    public String querySecKillResult(Long goodsId, String username) {
+        Object re  = stringRedisTemplate.opsForHash().get(Constant.RedisKey.KEY_KILL_RESULT, String.format(Constant.RedisKey.KEY_RESULT_KEY, username, goodsId));
+        return re.toString();
     }
 
 }

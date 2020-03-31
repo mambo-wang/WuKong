@@ -11,11 +11,16 @@ public interface Constant {
         String KEY_SALES = "wukong_sales";
 
         String KEY_USER = "wukong_user";
+
         String KEY_TOKEN = "wukong_token";
         /**
          * 一定时间内用户访问次数
          */
         String KEY_ACCESS = "wukong_access";
+        //秒杀结果
+        String KEY_KILL_RESULT = "wukong_result";
+
+        String KEY_RESULT_KEY = "username:%s-goodsId:%s";
     }
 
     interface Order{
@@ -29,5 +34,11 @@ public interface Constant {
         int STAT_BACK = 4;
         int STAT_DONE = 5;
         int STAT_CANCEL = 6;
+    }
+
+    interface SecKill{
+        String  processing = "processing";
+        String  success = "success";
+        String  fail = "fail";
     }
 }

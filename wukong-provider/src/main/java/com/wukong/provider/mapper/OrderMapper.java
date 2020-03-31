@@ -27,7 +27,7 @@ public interface OrderMapper {
         "#{status,jdbcType=INTEGER}, #{createDate,jdbcType=TIMESTAMP}, ",
         "#{payDate,jdbcType=TIMESTAMP})"
     })
-    int insert(Order record);
+    int insert(Order record);//id是自定义的
 
     int insertSelective(Order record);
 

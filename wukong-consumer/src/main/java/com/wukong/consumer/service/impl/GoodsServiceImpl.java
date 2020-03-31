@@ -94,8 +94,6 @@ public class GoodsServiceImpl implements GoodsService, InitializingBean {
     @Override
     public int reduceStock(Long goodsId) {
         int num = goodsRepository.reduceStock(goodsId);
-        Goods goods = goodsRepository.findById(goodsId).get();
-        redisTemplate.opsForHash().put(Constant.RedisKey.KEY_GOODS, goods.getId().toString(), JSONObject.toJSONString(goods));
         return num;
     }
 
