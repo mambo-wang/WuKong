@@ -49,8 +49,8 @@ public class ObjectReceiver {
         log.info("Receiver object : {}", payDTO);
 
         //step 1 pay  todo 付款方法
-        boolean res = true;
-        if(res){
+        int res = userService.reduceBalance(payDTO.getUsername(), payDTO.getGoods().getPrice());
+        if(res > 0){
             //step 2 update order state
             orderService.updateState(payDTO, Constant.Order.STAT_PAY);
             //step 3 add score

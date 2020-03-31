@@ -1,5 +1,7 @@
 package com.wukong.provider.entity;
 
+import java.math.BigDecimal;
+
 public class User {
     private Long id;
 
@@ -15,7 +17,9 @@ public class User {
 
     private String email;
 
-    private Integer score = 0;
+    private Integer score;
+
+    private BigDecimal balance;
 
     public Long getId() {
         return id;
@@ -79,5 +83,13 @@ public class User {
 
     public void setScore(Integer score) {
         this.score = score;
+    }
+
+    public BigDecimal getBalance() {
+        return balance;
+    }
+
+    public void setBalance(BigDecimal balance) {
+        this.balance = balance;
     }
 }

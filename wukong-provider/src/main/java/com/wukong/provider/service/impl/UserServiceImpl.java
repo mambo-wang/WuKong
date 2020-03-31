@@ -133,6 +133,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public int reduceBalance(String username, Double price) {
+        return userMapper.reduceBalance(username, price);
+    }
+
+    @Override
     public Workbook createExcelTemplate() {
         HSSFWorkbook workbook = new HSSFWorkbook();
         List<String> commonHeaders = Arrays.asList("姓名|（必填）","用户名|（必填）","收货地址|（必填）","电话|（选填）","邮箱|（必填）");

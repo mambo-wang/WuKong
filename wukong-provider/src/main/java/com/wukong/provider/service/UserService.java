@@ -32,6 +32,8 @@ public interface UserService {
 
     void addScore(PayDTO payDTO);
 
+    int reduceBalance(String username, Double price);
+
     Workbook createExcelTemplate();
 
     UserImportVO uploadExcel(MultipartFile file) throws IOException, InstantiationException, IllegalAccessException;

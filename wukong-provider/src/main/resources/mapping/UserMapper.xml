@@ -10,82 +10,92 @@
     <result column="phone_number" property="phoneNumber" jdbcType="VARCHAR" />
     <result column="email" property="email" jdbcType="VARCHAR" />
     <result column="score" property="score" jdbcType="INTEGER" />
+    <result column="balance" property="balance" jdbcType="DECIMAL" />
   </resultMap>
-  <sql id="Base_Column_List" >
-    id, name, username, password, address, phone_number, email, score
+  <sql id="Base_Column_List">
+    id, name, username, password, address, phone_number, email, score, balance
   </sql>
-  <insert id="insertSelective" parameterType="com.wukong.provider.entity.User" useGeneratedKeys="true" keyProperty="id" >
+  <insert id="insertSelective" keyProperty="id" parameterType="com.wukong.provider.entity.User" useGeneratedKeys="true">
     insert into tbl_user
-    <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="name != null" >
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="name != null">
         name,
       </if>
-      <if test="username != null" >
+      <if test="username != null">
         username,
       </if>
-      <if test="password != null" >
+      <if test="password != null">
         password,
       </if>
-      <if test="address != null" >
+      <if test="address != null">
         address,
       </if>
-      <if test="phoneNumber != null" >
+      <if test="phoneNumber != null">
         phone_number,
       </if>
-      <if test="email != null" >
+      <if test="email != null">
         email,
       </if>
-      <if test="score != null" >
+      <if test="score != null">
         score,
       </if>
+      <if test="balance != null">
+        balance,
+      </if>
     </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="name != null" >
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="name != null">
         #{name,jdbcType=VARCHAR},
       </if>
-      <if test="username != null" >
+      <if test="username != null">
         #{username,jdbcType=VARCHAR},
       </if>
-      <if test="password != null" >
+      <if test="password != null">
         #{password,jdbcType=VARCHAR},
       </if>
-      <if test="address != null" >
+      <if test="address != null">
         #{address,jdbcType=VARCHAR},
       </if>
-      <if test="phoneNumber != null" >
+      <if test="phoneNumber != null">
         #{phoneNumber,jdbcType=VARCHAR},
       </if>
-      <if test="email != null" >
+      <if test="email != null">
         #{email,jdbcType=VARCHAR},
       </if>
-      <if test="score != null" >
+      <if test="score != null">
         #{score,jdbcType=INTEGER},
+      </if>
+      <if test="balance != null">
+        #{balance,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.wukong.provider.entity.User" >
+  <update id="updateByPrimaryKeySelective" parameterType="com.wukong.provider.entity.User">
     update tbl_user
-    <set >
-      <if test="name != null" >
+    <set>
+      <if test="name != null">
         name = #{name,jdbcType=VARCHAR},
       </if>
-      <if test="username != null" >
+      <if test="username != null">
         username = #{username,jdbcType=VARCHAR},
       </if>
-      <if test="password != null" >
+      <if test="password != null">
         password = #{password,jdbcType=VARCHAR},
       </if>
-      <if test="address != null" >
+      <if test="address != null">
         address = #{address,jdbcType=VARCHAR},
       </if>
-      <if test="phoneNumber != null" >
+      <if test="phoneNumber != null">
         phone_number = #{phoneNumber,jdbcType=VARCHAR},
       </if>
-      <if test="email != null" >
+      <if test="email != null">
         email = #{email,jdbcType=VARCHAR},
       </if>
-      <if test="score != null" >
+      <if test="score != null">
         score = #{score,jdbcType=INTEGER},
+      </if>
+      <if test="balance != null">
+        score = #{balance,jdbcType=DECIMAL},
       </if>
     </set>
     where id = #{id,jdbcType=BIGINT}

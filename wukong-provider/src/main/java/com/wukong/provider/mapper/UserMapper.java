@@ -21,11 +21,11 @@ public interface UserMapper {
         "insert into tbl_user (name, username, ",
         "password, address, ",
         "phone_number, email, ",
-        "score)",
+        "score, balance)",
         "values (#{name,jdbcType=VARCHAR}, #{username,jdbcType=VARCHAR}, ",
         "#{password,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, ",
         "#{phoneNumber,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, ",
-        "#{score,jdbcType=INTEGER})"
+        "#{score,jdbcType=INTEGER}, #{balance,jdbcType=DECIMAL})"
     })
     @Options(useGeneratedKeys=true,keyProperty="id")
     int insert(User record);
@@ -34,7 +34,7 @@ public interface UserMapper {
 
     @Select({
         "select",
-        "id, name, username, password, address, phone_number, email, score",
+        "id, name, username, password, address, phone_number, email, score, balance",
         "from tbl_user",
         "where id = #{id,jdbcType=BIGINT}"
     })
@@ -51,24 +51,31 @@ public interface UserMapper {
           "address = #{address,jdbcType=VARCHAR},",
           "phone_number = #{phoneNumber,jdbcType=VARCHAR},",
           "email = #{email,jdbcType=VARCHAR},",
-          "score = #{score,jdbcType=INTEGER}",
+          "score = #{score,jdbcType=INTEGER},",
+          "balance = #{balance,jdbcType=DECIMAL}",
         "where id = #{id,jdbcType=BIGINT}"
     })
     int updateByPrimaryKey(User record);
 
     @Select({
             "select",
-            "id, name, username, password, address, phone_number, email, score",
+            "id, name, username, password, address, phone_number, email, score, balance",
             "from tbl_user"
     })
     List<User> getAll();
 
     @Select({
             "select",
-            "id, name, username, password, address, phone_number, email, score",
+            "id, name, username, password, address, phone_number, email, score, balance",
             "from tbl_user",
             "where username = #{username,jdbcType=VARCHAR}"
     })
     @ResultMap("BaseResultMap")
     User selectByUsername(String username);
+
+
+    @Update({
+            "update tbl_user set balance = balance - #{price,jdbcType=DECIMAL} where username = #{username,jdbcType=VARCHAR} and balance > #{price,jdbcType=DECIMAL}"
+    })
+    int reduceBalance(String username, Double price);
 }
