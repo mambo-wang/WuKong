@@ -20,7 +20,7 @@ public interface Constant {
         //秒杀结果
         String KEY_KILL_RESULT = "wukong_result";
 
-        String KEY_RESULT_KEY = "username:%s-goodsId:%s";
+        String KEY_RESULT_KEY = "orderId:%s";
     }
 
     interface Order{
@@ -40,5 +40,9 @@ public interface Constant {
         String  processing = "processing";
         String  success = "success";
         String  fail = "fail";
+    }
+
+    interface RabbitMQ{
+        String queueAddScore = "addScore";
     }
 }

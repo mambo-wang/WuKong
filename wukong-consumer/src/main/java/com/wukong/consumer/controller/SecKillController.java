@@ -42,15 +42,8 @@ public class SecKillController {
     @AccessLimit(seconds = 60, maxCount = 5, needLogin = false)
     @GetMapping()
     public BaseResult secKill(@RequestParam(name = "goodsId")Long goodsId, @RequestParam(name = "username")String username){
-        secKillService.secKill(goodsId, username);
-        return BaseResult.success(null);
-    }
-
-    @ApiOperation(value = "查询秒杀结果")
-    @GetMapping("/result")
-    public BaseResult result(@RequestParam(name = "goodsId")Long goodsId, @RequestParam(name = "username")String username){
-        String result = secKillService.querySecKillResult(goodsId, username);
-        return BaseResult.success(result);
+        Long orderId = secKillService.secKill(goodsId, username);
+        return BaseResult.success(orderId.toString());
     }
 
     @ApiOperation(value = "导出商品清单")

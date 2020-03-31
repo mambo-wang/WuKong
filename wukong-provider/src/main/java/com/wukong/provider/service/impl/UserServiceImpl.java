@@ -3,7 +3,6 @@ package com.wukong.provider.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.wukong.common.contants.Constant;
 import com.wukong.common.exception.BusinessException;
-import com.wukong.common.model.PayDTO;
 import com.wukong.common.model.UserVO;
 import com.wukong.common.utils.ExcelTool;
 import com.wukong.provider.controller.vo.LoginVO;
@@ -31,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -71,8 +71,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserVO addUser(UserEditVO userEditVO) {
-        userMapper.insert(convertToDO(userEditVO));
-        return findByUsername(userEditVO.getUsername());
+        User user = convertToDO(userEditVO);
+        userMapper.insert(user);
+        return findById(user.getId());
     }
 
     @CacheEvict(value = "redis-user", key = "'user' + #userEditVO.id")
@@ -120,21 +121,21 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public void addScore(PayDTO payDTO) {
-        User user = userMapper.selectByUsername(payDTO.getUsername());
+    public void addScore(Long userId, Integer score) {
+        User user = userMapper.selectByPrimaryKey(userId);
         log.info("------add score method invoke {}", System.currentTimeMillis());
-        user.setScore(user.getScore() + payDTO.getGoods().getPrice().intValue());
+        user.setScore(user.getScore() + score);
         log.info("------before db method invoke {}", System.currentTimeMillis());
         userMapper.updateByPrimaryKey(user);
         log.info("------after db method invoke {}", System.currentTimeMillis());
 
-        mailService.sendSimpleMail("mambo1991@163.com", "【悟空秒杀】积分增加通知","亲爱的" + payDTO.getUsername() + "恭喜您下单成功，"
-                + payDTO.getGoods().getPrice()+"积分已到账,目前共有积分" + user.getScore()+"\n--悟空商城");
+        mailService.sendSimpleMail("mambo1991@163.com", "【悟空秒杀】积分增加通知","亲爱的" + user.getName() + "恭喜您下单成功，"
+                + score+"积分已到账,目前共有积分" + user.getScore()+"\n--悟空商城");
     }
 
     @Override
-    public int reduceBalance(String username, Double price) {
-        return userMapper.reduceBalance(username, price);
+    public int reduceBalance(Long userId, BigDecimal price) {
+        return userMapper.reduceBalance(userId, price);
     }
 
     @Override
@@ -165,6 +166,15 @@ public class UserServiceImpl implements UserService {
             return new UserImportVO(false, errorData);
         }
 
+    }
+
+    @Override
+    public boolean checkPwd(Long userId, String password) {
+        User user = userMapper.selectByPrimaryKey(userId);
+        if(user == null || !password.equals(user.getPassword())) {
+            return false;
+        }
+        return true;
     }
 
     private void importData(List<UserImportDTO> userImportDTOS){

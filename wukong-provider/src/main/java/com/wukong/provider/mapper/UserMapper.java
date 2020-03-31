@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.ResultMap;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface UserMapper {
@@ -75,7 +76,7 @@ public interface UserMapper {
 
 
     @Update({
-            "update tbl_user set balance = balance - #{price,jdbcType=DECIMAL} where username = #{username,jdbcType=VARCHAR} and balance > #{price,jdbcType=DECIMAL}"
+            "update tbl_user set balance = balance - #{price,jdbcType=DECIMAL} where id = #{id,jdbcType=BIGINT} and balance > #{price,jdbcType=DECIMAL}"
     })
-    int reduceBalance(String username, Double price);
+    int reduceBalance(Long id, BigDecimal price);
 }

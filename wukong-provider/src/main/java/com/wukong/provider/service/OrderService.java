@@ -1,11 +1,17 @@
 package com.wukong.provider.service;
 
-import com.wukong.common.model.GoodsVO;
-import com.wukong.common.model.PayDTO;
+import com.wukong.common.model.SecKillDTO;
+import com.wukong.provider.controller.vo.OrderVO;
+import com.wukong.provider.controller.vo.PayVO;
 
 public interface OrderService {
 
-    int createOrder(PayDTO payDTO);
+    int createOrder(SecKillDTO secKillDTO);
 
-    boolean updateState(PayDTO payDTO, Integer state);
+    boolean updateState(Long orderId, Integer state);
+
+    OrderVO payMoney(PayVO payVO);
+
+    OrderVO querySecKillResult(Long orderId);
+
 }

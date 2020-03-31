@@ -9,7 +9,7 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PayDTO implements Serializable {
+public class SecKillDTO implements Serializable {
     private static final long serialVersionUID = -4640517863417723452L;
     private String username;
 

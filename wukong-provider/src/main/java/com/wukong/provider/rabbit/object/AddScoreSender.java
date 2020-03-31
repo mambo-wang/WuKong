@@ -1,19 +1,20 @@
-package com.wukong.consumer.rabbit.object;
+package com.wukong.provider.rabbit.object;
 
-import com.wukong.common.model.SecKillDTO;
+import com.wukong.common.contants.Constant;
+import com.wukong.provider.dto.AddScoreDTO;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ObjectSender {
+public class AddScoreSender {
 
 	@Autowired
 	private AmqpTemplate rabbitTemplate;
 
-	public void send(SecKillDTO user) {
+	public void send(AddScoreDTO user) {
 		System.out.println("Sender object: " + user.toString());
-		this.rabbitTemplate.convertAndSend("object", user);
+		this.rabbitTemplate.convertAndSend(Constant.RabbitMQ.queueAddScore, user);
 	}
 
 }

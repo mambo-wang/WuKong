@@ -1,6 +1,5 @@
 package com.wukong.provider.service;
 
-import com.wukong.common.model.PayDTO;
 import com.wukong.common.model.UserVO;
 import com.wukong.provider.controller.vo.LoginVO;
 import com.wukong.provider.controller.vo.UserImportVO;
@@ -10,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface UserService {
@@ -30,11 +30,13 @@ public interface UserService {
 
     UserVO getByToken(HttpServletResponse response, String token);
 
-    void addScore(PayDTO payDTO);
+    void addScore(Long userId, Integer score);
 
-    int reduceBalance(String username, Double price);
+    int reduceBalance(Long userId, BigDecimal price);
 
     Workbook createExcelTemplate();
 
     UserImportVO uploadExcel(MultipartFile file) throws IOException, InstantiationException, IllegalAccessException;
+
+    boolean checkPwd(Long userId, String password);
 }

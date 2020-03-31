@@ -1,6 +1,6 @@
 package com.wukong.consumer.rabbit.hello;
 
-import com.wukong.common.model.PayDTO;
+import com.wukong.common.model.SecKillDTO;
 import com.wukong.consumer.rabbit.DelayConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.AmqpTemplate;
@@ -26,10 +26,10 @@ public class HelloSender {
 
 	/**
 	 * 延迟消息
-	 * @param payDTO
+	 * @param secKillDTO
 	 */
-	public void sendDeadLetter(PayDTO payDTO, long seconds){
-		this.rabbitTemplate.convertAndSend(DelayConfig.EXCHANGE_DELAY, DelayConfig.ROUTINGKEY_DELAY, payDTO, message -> {
+	public void sendDeadLetter(SecKillDTO secKillDTO, long seconds){
+		this.rabbitTemplate.convertAndSend(DelayConfig.EXCHANGE_DELAY, DelayConfig.ROUTINGKEY_DELAY, secKillDTO, message -> {
 			message.getMessageProperties().setHeader(AbstractJavaTypeMapper.DEFAULT_CONTENT_CLASSID_FIELD_NAME, String.class.getName());
 			message.getMessageProperties().setExpiration(seconds * 1000 + "");
 			return message;

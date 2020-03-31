@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -65,8 +66,7 @@ public class GoodsServiceImpl implements GoodsService, InitializingBean {
 
     @Override
     public GoodsVO getOne(Long goodsId) {
-        HashOperations<String, String, String> hashOperations = redisTemplate.opsForHash();
-        return JSONObject.parseObject(hashOperations.get(Constant.RedisKey.KEY_GOODS, goodsId.toString()), GoodsVO.class);
+        return convert(goodsRepository.findById(goodsId).orElseThrow(() -> new BusinessException("500", "找不到该商品")));
     }
 
     @Override
@@ -124,7 +124,7 @@ public class GoodsServiceImpl implements GoodsService, InitializingBean {
             redisTemplate.opsForHash().put(Constant.RedisKey.KEY_GOODS, goods.getId().toString(), JSONObject.toJSONString(goods));
             redisTemplate.opsForHash().put(Constant.RedisKey.KEY_STOCK, goods.getId().toString(), goods.getStock().toString());
         });
-        redisTemplate.expire(Constant.RedisKey.KEY_GOODS, 10, TimeUnit.MINUTES);
+        redisTemplate.expire(Constant.RedisKey.KEY_GOODS, 30, TimeUnit.MINUTES);
     }
 
 //    /** boss直聘笔试题

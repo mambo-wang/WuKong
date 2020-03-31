@@ -1,14 +1,24 @@
 package com.wukong.provider.service.impl;
 
+import com.alibaba.dubbo.config.annotation.Reference;
+import com.wukong.common.dubbo.DubboStockService;
+import com.wukong.common.exception.BusinessException;
+import com.wukong.common.model.BaseResult;
 import com.wukong.common.model.GoodsVO;
-import com.wukong.common.model.PayDTO;
+import com.wukong.common.model.SecKillDTO;
 import com.wukong.common.model.UserVO;
 import com.wukong.common.contants.Constant;
+import com.wukong.provider.controller.vo.OrderVO;
+import com.wukong.provider.controller.vo.PayVO;
+import com.wukong.provider.dto.AddScoreDTO;
 import com.wukong.provider.entity.Order;
 import com.wukong.provider.mapper.OrderMapper;
+import com.wukong.provider.rabbit.object.AddScoreSender;
 import com.wukong.provider.service.OrderService;
 import com.wukong.provider.service.UserService;
+import io.seata.spring.annotation.GlobalTransactional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -26,19 +36,25 @@ public class OrderServiceImpl implements OrderService {
     private OrderMapper orderMapper;
 
     @Autowired
-    private StringRedisTemplate redisTemplate;
+    private StringRedisTemplate stringRedisTemplate;
 
     @Autowired
     private UserService userService;
 
+    @Reference(retries = 2, timeout = 10000)
+    private DubboStockService dubboStockService;
+
+    @Autowired
+    private AddScoreSender addScoreSender;
+
     @Override
-    public int createOrder(PayDTO payDTO) {
-        GoodsVO goodsVO = payDTO.getGoods();
+    public int createOrder(SecKillDTO secKillDTO) {
+        GoodsVO goodsVO = secKillDTO.getGoods();
         if(Objects.isNull(goodsVO)){
             return -1;
         }
-        String username = payDTO.getUsername();
-        Long id = payDTO.getOrderId();
+        String username = secKillDTO.getUsername();
+        Long id = secKillDTO.getOrderId();
         log.info("add order");
         UserVO userVO = userService.findByUsername(username);
         Order order = new Order();
@@ -53,22 +69,102 @@ public class OrderServiceImpl implements OrderService {
         order.setStatus(Constant.Order.STAT_NOT_PAY);
         order.setPayDate(new Date());
         int num = orderMapper.insert(order);
-        if(redisTemplate.hasKey(Constant.RedisKey.KEY_SALES)){
-            redisTemplate.opsForHash().increment(Constant.RedisKey.KEY_SALES, goodsVO.getId().toString(), 1);
-        } else {
-            redisTemplate.opsForHash().put(Constant.RedisKey.KEY_SALES, goodsVO.getId().toString(), "1");
-        }
         return num;
     }
 
     @Override
-    public boolean updateState(PayDTO payDTO, Integer state) {
-        Order order = orderMapper.selectByPrimaryKey(payDTO.getOrderId());
+    public boolean updateState(Long orderId, Integer state) {
+        Order order = orderMapper.selectByPrimaryKey(orderId);
         if(Objects.isNull(order)){
             return false;
         }
         order.setStatus(state);
         orderMapper.updateByPrimaryKey(order);
         return true;
+    }
+
+    @GlobalTransactional(timeoutMills = 300000, name = "pay-seata-transaction")
+    @Override
+    public OrderVO payMoney(PayVO payVO) {
+
+        Order order = orderMapper.selectByPrimaryKey(payVO.getOrderId());
+        //校验订单有效性
+        if(order.getStatus() != Constant.Order.STAT_NOT_PAY){
+            throw new BusinessException("500", "訂單状态异常");
+        }
+        log.info("订单状态校验通过");
+
+        boolean flag = userService.checkPwd(order.getUserId(), payVO.getPassword());
+        if(!flag){
+            throw new BusinessException("500", "支付密码（同登录密码）输入错误");
+        }
+        log.info("支付密码校验通过");
+
+        //校验库存
+        BaseResult<Integer> baseResult = dubboStockService.queryStock(order.getGoodsId());
+        if(baseResult.getType() <0 || baseResult.getData() <= 0){
+            throw new BusinessException("500", "库存为空");
+        }
+        log.info("库存校验通过，还剩余库存：{}", baseResult.getData());
+
+        //step 1 pay
+        int res = userService.reduceBalance(order.getUserId(), order.getGoodsPrice());
+        if(res > 0){
+
+            log.info("支付成功");
+            //真正减库存
+            dubboStockService.reduceStock(order.getGoodsId());
+            log.info("减库存成功");
+            //step 2 update order state
+            updateState(payVO.getOrderId(), Constant.Order.STAT_PAY);
+            log.info("修改订单状态成功，修改为：{}",Constant.Order.STAT_PAY);
+
+            //step 3 add score
+            addScoreSender.send(new AddScoreDTO(order.getUserId(), order.getGoodsPrice().intValue()));
+            log.info("发送用户增加积分消息成功");
+
+            //商品售出数据统计
+            if(stringRedisTemplate.hasKey(Constant.RedisKey.KEY_SALES)){
+                stringRedisTemplate.opsForHash().increment(Constant.RedisKey.KEY_SALES, order.getGoodsId().toString(), 1);
+            } else {
+                stringRedisTemplate.opsForHash().put(Constant.RedisKey.KEY_SALES, order.getGoodsId().toString(), "1");
+            }
+
+        } else {
+            log.info("支付失败");
+
+            //加库存
+            stringRedisTemplate.opsForHash().increment(Constant.RedisKey.KEY_STOCK, order.getGoodsId().toString(), 1);
+            //订单状态修改
+            updateState(payVO.getOrderId(), Constant.Order.STAT_CANCEL);
+        }
+
+        return convert(orderMapper.selectByPrimaryKey(payVO.getOrderId()));
+    }
+
+    @Override
+    public OrderVO querySecKillResult(Long orderId) {
+        Order order = orderMapper.selectByPrimaryKey(orderId);
+        if(Objects.isNull(order)){
+            Object state = stringRedisTemplate.opsForHash().get(Constant.RedisKey.KEY_KILL_RESULT, String.format(Constant.RedisKey.KEY_RESULT_KEY, orderId));
+
+            if(Objects.isNull(state)){
+                throw new BusinessException("500", "订单正在创建中，请稍后再查");
+            }
+            String stateDesc = String.valueOf(state);
+            if(stateDesc.equals(Constant.SecKill.fail)){
+                throw new BusinessException("500", "订单创建失败，秒杀失败");
+            }
+        }
+        return convert(order);
+    }
+
+    private OrderVO convert(Order order){
+
+        OrderVO orderVO = new OrderVO();
+        BeanUtils.copyProperties(order, orderVO);
+
+        return orderVO;
+
     }
 }
