@@ -32,10 +32,17 @@ public class OrderServiceImpl implements OrderService {
     private UserService userService;
 
     @Override
-    public Long createOrder(GoodsVO goodsVO, String username) {
+    public int createOrder(PayDTO payDTO) {
+        GoodsVO goodsVO = payDTO.getGoods();
+        if(Objects.isNull(goodsVO)){
+            return -1;
+        }
+        String username = payDTO.getUsername();
+        Long id = payDTO.getOrderId();
         log.info("add order");
         UserVO userVO = userService.findByUsername(username);
         Order order = new Order();
+        order.setId(id);
         order.setAddress(userVO.getAddress());
         order.setCreateDate(new Date());
         order.setGoodsCount(1);
@@ -45,13 +52,13 @@ public class OrderServiceImpl implements OrderService {
         order.setGoodsPrice(BigDecimal.valueOf(goodsVO.getPrice()));
         order.setStatus(Constant.Order.STAT_NOT_PAY);
         order.setPayDate(new Date());
-        orderMapper.insert(order);
+        int num = orderMapper.insert(order);
         if(redisTemplate.hasKey(Constant.RedisKey.KEY_SALES)){
             redisTemplate.opsForHash().increment(Constant.RedisKey.KEY_SALES, goodsVO.getId().toString(), 1);
         } else {
             redisTemplate.opsForHash().put(Constant.RedisKey.KEY_SALES, goodsVO.getId().toString(), "1");
         }
-        return order.getId();
+        return num;
     }
 
     @Override

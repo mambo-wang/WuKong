@@ -23,7 +23,8 @@ public class DubboOrderServiceImpl implements DubboOrderService {
     public BaseResult addOrder(GoodsVO goodsVO, String username) {
 
         System.out.println("全局事务id ：" + RootContext.getXID());
-        Long num = orderService.createOrder(goodsVO, username);
+//        int num = orderService.createOrder(goodsVO, username);
+        int num = 1;
         if(Objects.nonNull(num)){
             return BaseResult.success(num);
         } else {

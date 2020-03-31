@@ -8,6 +8,7 @@ import com.wukong.common.model.PayDTO;
 import com.wukong.common.model.BaseResult;
 import com.wukong.common.model.GoodsVO;
 import com.wukong.common.contants.Constant;
+import com.wukong.common.utils.SnowFlake;
 import com.wukong.consumer.rabbit.hello.HelloSender;
 import com.wukong.consumer.rabbit.object.ObjectSender;
 import com.wukong.consumer.service.GoodsService;
@@ -41,6 +42,8 @@ public class SecKillServiceImpl implements SecKillService {
     @Autowired
     private HelloSender helloSender;
 
+    private final SnowFlake snowFlake = new SnowFlake(1,1);
+
     /**
      * seata at 分布式事务秒杀接口
      * todo tcc：锁定库存--减库存--失败加库存  创建订单--创建订单--删除订单
@@ -69,22 +72,16 @@ public class SecKillServiceImpl implements SecKillService {
         //预减库存，操作redis
         stringRedisTemplate.opsForHash().increment(Constant.RedisKey.KEY_STOCK, goodsId.toString(), -1);
 
-        //创建订单，dubbo调用，操作数据库
+        //snowflake算法创建orderId
+        Long orderId = snowFlake.nextId();
         HashOperations<String, String, String> hashOperations = stringRedisTemplate.opsForHash();
         GoodsVO goodsVO = JSONObject.parseObject(hashOperations.get(Constant.RedisKey.KEY_GOODS, goodsId.toString()), GoodsVO.class);
-        BaseResult<Long> baseResult = dubboOrderService.addOrder(goodsVO, username);
 
-        if(baseResult.getType() < 0){
-            throw new BusinessException("500","秒杀失败");
-        }
-
-        PayDTO payDTO = new PayDTO(username, goodsVO.getId(), goodsVO.getPrice(), baseResult.getData());
-        //付款，修改订单状态、增加积分
+        PayDTO payDTO = new PayDTO(username, goodsVO, orderId);
+        //创建订单、付款，修改订单状态、增加积分
         objectSender.send(payDTO);
-
-        //超时未付款释放库存
+        //超时未付款（检验订单状态）释放库存
         helloSender.sendDeadLetter(payDTO, TimeUnit.MINUTES.toSeconds(1));
-
     }
 
 }

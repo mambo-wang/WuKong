@@ -5,7 +5,7 @@ import com.wukong.common.model.PayDTO;
 
 public interface OrderService {
 
-    Long createOrder(GoodsVO goodsVO, String username);
+    int createOrder(PayDTO payDTO);
 
     boolean updateState(PayDTO payDTO, Integer state);
 }

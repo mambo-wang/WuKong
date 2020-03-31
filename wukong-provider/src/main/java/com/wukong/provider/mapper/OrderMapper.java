@@ -16,21 +16,20 @@ public interface OrderMapper {
     int deleteByPrimaryKey(Long id);
 
     @Insert({
-        "insert into tbl_order (user_id, goods_id, ",
+        "insert into tbl_order (id, user_id, goods_id, ",
         "address, goods_name, ",
         "goods_count, goods_price, ",
         "status, create_date, ",
         "pay_date)",
-        "values (#{userId,jdbcType=BIGINT}, #{goodsId,jdbcType=BIGINT}, ",
+        "values (#{id,jdbcType=BIGINT},#{userId,jdbcType=BIGINT}, #{goodsId,jdbcType=BIGINT}, ",
         "#{address,jdbcType=VARCHAR}, #{goodsName,jdbcType=VARCHAR}, ",
         "#{goodsCount,jdbcType=INTEGER}, #{goodsPrice,jdbcType=DECIMAL}, ",
         "#{status,jdbcType=INTEGER}, #{createDate,jdbcType=TIMESTAMP}, ",
         "#{payDate,jdbcType=TIMESTAMP})"
     })
-    @Options(useGeneratedKeys=true,keyProperty="id")
-    Long insert(Order record);//todo 返回Id
+    int insert(Order record);
 
-    Long insertSelective(Order record);
+    int insertSelective(Order record);
 
     @Select({
         "select",

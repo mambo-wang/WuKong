@@ -28,6 +28,14 @@ public class ObjectReceiver {
 
     @RabbitHandler
     public void process(PayDTO payDTO) {
+
+        int num = orderService.createOrder(payDTO);
+
+        if(num < 0){
+            System.out.println("订单创建失败");
+            return;
+        }
+
         log.info("Receiver object : {}", payDTO);
 
         //step 1 pay  todo 付款方法
@@ -43,7 +51,7 @@ public class ObjectReceiver {
 
         } else {
             //加库存
-            stringRedisTemplate.opsForHash().increment(Constant.RedisKey.KEY_STOCK, payDTO.getGoodsId().toString(), 1);
+            stringRedisTemplate.opsForHash().increment(Constant.RedisKey.KEY_STOCK, payDTO.getGoods().getId().toString(), 1);
             //订单状态修改
             orderService.updateState(payDTO, Constant.Order.STAT_CANCEL);
         }
