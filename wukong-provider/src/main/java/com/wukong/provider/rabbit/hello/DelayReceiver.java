@@ -33,6 +33,8 @@ public class DelayReceiver {
             //加库存
             log.info("超时未支付，回补库存 {}", message);
             stringRedisTemplate.opsForHash().increment(Constant.RedisKey.KEY_STOCK,message.getGoods().getId().toString(), 1);
+
+            orderService.updateState(message.getOrderId(), Constant.Order.STAT_TIMEOUT);
         }
     }
 

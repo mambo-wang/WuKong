@@ -33,7 +33,8 @@ public interface Constant {
         int STAT_RECEIVED = 3;
         int STAT_BACK = 4;
         int STAT_DONE = 5;
-        int STAT_CANCEL = 6;
+        int STAT_PAY_FAIL = 6;
+        int STAT_TIMEOUT = 7;
     }
 
     interface SecKill{

@@ -136,7 +136,7 @@ public class OrderServiceImpl implements OrderService {
             //加库存
             stringRedisTemplate.opsForHash().increment(Constant.RedisKey.KEY_STOCK, order.getGoodsId().toString(), 1);
             //订单状态修改
-            updateState(payVO.getOrderId(), Constant.Order.STAT_CANCEL);
+            updateState(payVO.getOrderId(), Constant.Order.STAT_PAY_FAIL);
         }
 
         return convert(orderMapper.selectByPrimaryKey(payVO.getOrderId()));
@@ -153,6 +153,7 @@ public class OrderServiceImpl implements OrderService {
             }
             String stateDesc = String.valueOf(state);
             if(stateDesc.equals(Constant.SecKill.fail)){
+                stringRedisTemplate.opsForHash().delete(Constant.RedisKey.KEY_KILL_RESULT, String.format(Constant.RedisKey.KEY_RESULT_KEY, orderId));
                 throw new BusinessException("500", "订单创建失败，秒杀失败");
             }
         }
