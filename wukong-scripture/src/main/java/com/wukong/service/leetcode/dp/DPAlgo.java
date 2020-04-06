@@ -12,7 +12,41 @@ public class DPAlgo {
         /**************************************斐波那契数列************************************************/
 //        System.out.println(algo.fib(5));
         /****************************************零钱兑换********************************************************/
-        System.out.println(algo.coinChange(new int[]{1,2,5}, 11));
+        System.out.println(algo.coinChange(new int[]{1, 2, 5}, 11));
+    }
+
+    /**
+     * leetCode 0406 72. 编辑距离
+     * https://leetcode-cn.com/problems/edit-distance/solution/jian-dan-dpmiao-dong-by-sweetiee/
+     * 编辑距离
+     * 状态定义：
+     * dp[i][j]表示word1的前i个字母转换成word2的前j个字母所使用的最少操作。
+     *
+     * 状态转移：
+     * i指向word1，j指向word2
+     * 若当前字母相同，则dp[i][j] = dp[i - 1][j - 1];
+     * 否则取增删替三个操作的最小值 + 1， 即:
+     * dp[i][j] = min(dp[i][j - 1], dp[i - 1][j], dp[i - 1][j - 1]) + 1
+     */
+    public int minDistance(String word1, String word2) {
+        int len1 = word1.length(), len2 = word2.length();
+        int[][] dp = new int[len1 + 1][len2 + 1];
+        for (int i = 0; i <= len1; i++) {
+            dp[i][0] = i;
+        }
+        for (int j = 0; j <= len2; j++) {
+            dp[0][j] = j;
+        }
+        for (int i = 1; i <= len1; i++) {
+            for (int j = 1; j <= len2; j++) {
+                if (word1.charAt(i - 1) == word2.charAt(j - 1)) {
+                    dp[i][j] = dp[i - 1][j - 1];
+                } else {
+                    dp[i][j] = 1 + Math.min(Math.min(dp[i - 1][j], dp[i][j - 1]), dp[i - 1][j - 1]);
+                }
+            }
+        }
+        return dp[len1][len2];
     }
 
     /**
@@ -41,7 +75,7 @@ public class DPAlgo {
      * leetCode，322 零钱兑换
      * 给定不同面额的硬币 coins 和一个总金额 amount。编写一个函数来计算可以凑成总金额所需的最少的硬币个数。如果没有任何一种硬币组合能组成总金额，返回 -1。
      * 链接：https://leetcode-cn.com/problems/coin-change
-     *
+     * <p>
      * 解题思路：动态规划
      * 两个小技巧：
      * 预设一个0位方便后续计算，组成0的最少硬币数是0，所以dp[0] = 0
