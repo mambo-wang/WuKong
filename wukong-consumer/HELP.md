@@ -1,12 +1,14 @@
-# Getting Started
+# 秒杀、商品服务
 
-### Reference Documentation
-For further reference, please consider the following sections:
+### 秒杀入口
+SecKillController
 
-* [Official Apache Maven documentation](https://maven.apache.org/guides/index.html)
+* [简单秒杀实现思路](https://blog.csdn.net/sinat_27143551/article/details/104455592)
+* [大型秒杀实现思路](https://blog.csdn.net/sinat_27143551/article/details/88614540)
 
-### Guides
-The following guides illustrate how to use some features concretely:
+
+### 商品入口
+GoodsController
 
 * [Building a RESTful Web Service](https://spring.io/guides/gs/rest-service/)
 * [Serving Web Content with Spring MVC](https://spring.io/guides/gs/serving-web-content/)

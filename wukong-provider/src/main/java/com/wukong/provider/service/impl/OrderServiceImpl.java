@@ -1,6 +1,8 @@
 package com.wukong.provider.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.alibaba.dubbo.rpc.cluster.loadbalance.RoundRobinLoadBalance;
+import com.alibaba.dubbo.rpc.cluster.support.FailfastCluster;
 import com.wukong.common.dubbo.DubboStockService;
 import com.wukong.common.exception.BusinessException;
 import com.wukong.common.model.BaseResult;
@@ -41,7 +43,7 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private UserService userService;
 
-    @Reference(retries = 2, timeout = 10000)
+    @Reference(retries = 2, timeout = 10000, url = "127.0.0.1:8084", loadbalance = RoundRobinLoadBalance.NAME, cluster = FailfastCluster.NAME)
     private DubboStockService dubboStockService;
 
     @Autowired

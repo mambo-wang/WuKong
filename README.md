@@ -11,9 +11,9 @@
 - kafka + aop + mongodb 实现操作日志传递、入库
 - 德鲁伊druid数据库连接池
 - 阿里巴巴seata  at/tcc分布式事务
-- jsoup + 邮件集成 + 观察者模式实现凤凰网新闻订阅、推送
+- jsoup + 邮件集成 + 观察者模式实现凤凰网新闻爬取、订阅、推送
 #### todo list
 - 对接微信支付宝支付
 - 配置mybatis缓存机制
-- 
+- [集成Hystrix实现服务容错降级](https://www.bilibili.com/video/BV1zt411M7pF?p=23)
 
