@@ -17,6 +17,7 @@ import com.wukong.provider.entity.User;
 import com.wukong.provider.mapper.UserMapper;
 import com.wukong.provider.service.MailService;
 import com.wukong.provider.service.UserService;
+import io.seata.spring.annotation.GlobalTransactional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -184,6 +185,7 @@ public class UserServiceImpl implements UserService {
         return true;
     }
 
+    @GlobalTransactional
     @Override
     public void testSeata(String username, String phoneNumber, Long goods) {
 

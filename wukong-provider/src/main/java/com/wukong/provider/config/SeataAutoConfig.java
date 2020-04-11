@@ -19,6 +19,6 @@ public class SeataAutoConfig {
      */
     @Bean
     public GlobalTransactionScanner globalTransactionScanner(){
-        return new GlobalTransactionScanner("seata-example-provider", "my_test_tx_group");
+        return new GlobalTransactionScanner("wukong-provider", "wukong-provider-group");
     }
 }
