@@ -3,6 +3,7 @@ package com.wukong.provider.controller;
 import com.wukong.common.model.BaseResult;
 import com.wukong.provider.config.rest.RestConnection;
 import com.wukong.provider.service.MailService;
+import com.wukong.provider.service.UserService;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -11,10 +12,7 @@ import org.springframework.data.geo.Point;
 import org.springframework.data.redis.connection.RedisGeoCommands;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,6 +31,17 @@ public class TestController {
 
     @Autowired
     private RedisTemplate redisTemplate;
+
+    @Autowired
+    private UserService userService;
+
+    @GetMapping("/seata")
+    public BaseResult testSeata(@RequestParam(name = "username")String username,
+                                @RequestParam(name = "phone")String phoneNumber,
+                                @RequestParam(name = "goods")Long goods){
+        userService.testSeata(username, phoneNumber, goods);
+        return BaseResult.success(null);
+    }
 
     @GetMapping
     public BaseResult hello(){

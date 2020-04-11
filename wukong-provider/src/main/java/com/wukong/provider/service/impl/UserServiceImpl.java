@@ -1,7 +1,11 @@
 package com.wukong.provider.service.impl;
 
+import com.alibaba.dubbo.config.annotation.Reference;
+import com.alibaba.dubbo.rpc.cluster.loadbalance.RoundRobinLoadBalance;
+import com.alibaba.dubbo.rpc.cluster.support.FailfastCluster;
 import com.alibaba.fastjson.JSONObject;
 import com.wukong.common.contants.Constant;
+import com.wukong.common.dubbo.DubboStockService;
 import com.wukong.common.exception.BusinessException;
 import com.wukong.common.model.UserVO;
 import com.wukong.common.utils.ExcelTool;
@@ -47,6 +51,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private MailService mailService;
+
+    @Reference(retries = 2, timeout = 10000, loadbalance = RoundRobinLoadBalance.NAME, cluster = FailfastCluster.NAME)
+    private DubboStockService dubboStockService;
 
     @Override
     public List<UserVO> queryAll() {
@@ -175,6 +182,16 @@ public class UserServiceImpl implements UserService {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public void testSeata(String username, String phoneNumber, Long goods) {
+
+        User user = this.userMapper.selectByUsername(username);
+        user.setPhoneNumber(phoneNumber);
+        userMapper.updateByPrimaryKey(user);
+
+        dubboStockService.reduceStock(goods);
     }
 
     private void importData(List<UserImportDTO> userImportDTOS){

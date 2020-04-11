@@ -43,7 +43,7 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private UserService userService;
 
-    @Reference(retries = 2, timeout = 10000, url = "127.0.0.1:8084", loadbalance = RoundRobinLoadBalance.NAME, cluster = FailfastCluster.NAME)
+    @Reference(retries = 2, timeout = 10000, loadbalance = RoundRobinLoadBalance.NAME, cluster = FailfastCluster.NAME)
     private DubboStockService dubboStockService;
 
     @Autowired

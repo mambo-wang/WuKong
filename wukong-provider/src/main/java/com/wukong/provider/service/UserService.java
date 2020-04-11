@@ -39,4 +39,6 @@ public interface UserService {
     UserImportVO uploadExcel(MultipartFile file) throws IOException, InstantiationException, IllegalAccessException;
 
     boolean checkPwd(Long userId, String password);
+
+    void testSeata(String username, String phoneNumber, Long goods);
 }

@@ -42,7 +42,7 @@ public class SecKillServiceImpl implements SecKillService {
     @Override
     public Long secKill(Long goodsId, String username) {
 
-        System.out.println("开始全局事务，XID = " + RootContext.getXID());
+        log.info("开始全局事务，XID = {}" ,RootContext.getXID());
 
         HashOperations<String, String, String> hashOperations = stringRedisTemplate.opsForHash();
         GoodsVO goodsVO = JSONObject.parseObject(hashOperations.get(Constant.RedisKey.KEY_GOODS, goodsId.toString()), GoodsVO.class);
