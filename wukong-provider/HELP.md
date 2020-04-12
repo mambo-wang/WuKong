@@ -6,3 +6,6 @@
 
 ### rabbitMQ生产者
 
+### seata分布式事务
+- TestController # testSeata 方法
+
