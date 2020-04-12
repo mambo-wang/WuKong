@@ -2,7 +2,7 @@ package com.wukong.provider.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.wukong.common.contants.Constant;
-import com.wukong.common.dubbo.DubboStockService;
+import com.wukong.common.dubbo.DubboTestService;
 import com.wukong.common.exception.BusinessException;
 import com.wukong.common.model.UserVO;
 import com.wukong.common.utils.ExcelTool;
@@ -54,7 +54,7 @@ public class UserServiceImpl implements UserService {
     private MailService mailService;
 
     @Reference(retries = 2, timeout = 10000, loadbalance = RoundRobinLoadBalance.NAME, cluster = FailfastCluster.NAME)
-    private DubboStockService dubboStockService;
+    private DubboTestService dubboTestService;
 
     @Override
     public List<UserVO> queryAll() {
@@ -193,7 +193,7 @@ public class UserServiceImpl implements UserService {
         user.setPhoneNumber(phoneNumber);
         userMapper.updateByPrimaryKey(user);
 
-        dubboStockService.reduceStock(goods);
+        dubboTestService.reduceStock(goods);
     }
 
     private void importData(List<UserImportDTO> userImportDTOS){
