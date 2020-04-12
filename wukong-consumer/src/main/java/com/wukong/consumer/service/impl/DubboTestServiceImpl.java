@@ -1,6 +1,7 @@
 package com.wukong.consumer.service.impl;
 
 import com.wukong.common.dubbo.DubboTestService;
+import com.wukong.common.exception.BusinessException;
 import com.wukong.common.model.BaseResult;
 import com.wukong.consumer.service.GoodsService;
 import org.apache.dubbo.config.annotation.Service;
@@ -20,7 +21,7 @@ public class DubboTestServiceImpl implements DubboTestService {
 
         int num = goodsService.reduceStock(goodsId);
         if(num <= 0){
-            return BaseResult.fail("500","减库存失败");
+            throw new BusinessException("500","减库存失败");
         }
         return BaseResult.success(num);
     }
