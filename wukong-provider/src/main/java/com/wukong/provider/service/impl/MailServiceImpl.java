@@ -39,7 +39,7 @@ public class MailServiceImpl implements MailService {
 
     Queue<NewsBO> queue = new LinkedList<>();
 
-    @Scheduled(fixedRate = 10 * 60 * 1000)
+    @Override
     public void publishNews(){
         List<NewsBO> newsBOList = CrawlerTool.jsoupList();
         Set<NewsBO> publish = new HashSet<>();
