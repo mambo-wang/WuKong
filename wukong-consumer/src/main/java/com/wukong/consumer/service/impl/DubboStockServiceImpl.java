@@ -1,10 +1,10 @@
 package com.wukong.consumer.service.impl;
 
-import com.alibaba.dubbo.config.annotation.Service;
 import com.wukong.common.dubbo.DubboStockService;
 import com.wukong.common.model.BaseResult;
 import com.wukong.common.model.GoodsVO;
 import com.wukong.consumer.service.GoodsService;
+import org.apache.dubbo.config.annotation.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;

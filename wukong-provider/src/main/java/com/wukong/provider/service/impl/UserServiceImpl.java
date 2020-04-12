@@ -1,8 +1,5 @@
 package com.wukong.provider.service.impl;
 
-import com.alibaba.dubbo.config.annotation.Reference;
-import com.alibaba.dubbo.rpc.cluster.loadbalance.RoundRobinLoadBalance;
-import com.alibaba.dubbo.rpc.cluster.support.FailfastCluster;
 import com.alibaba.fastjson.JSONObject;
 import com.wukong.common.contants.Constant;
 import com.wukong.common.dubbo.DubboStockService;
@@ -20,6 +17,9 @@ import com.wukong.provider.service.UserService;
 import io.seata.spring.annotation.GlobalTransactional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.dubbo.config.annotation.Reference;
+import org.apache.dubbo.rpc.cluster.loadbalance.RoundRobinLoadBalance;
+import org.apache.dubbo.rpc.cluster.support.FailfastCluster;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.BeanUtils;

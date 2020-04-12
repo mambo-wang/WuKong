@@ -1,8 +1,5 @@
 package com.wukong.provider.service.impl;
 
-import com.alibaba.dubbo.config.annotation.Reference;
-import com.alibaba.dubbo.rpc.cluster.loadbalance.RoundRobinLoadBalance;
-import com.alibaba.dubbo.rpc.cluster.support.FailfastCluster;
 import com.wukong.common.dubbo.DubboStockService;
 import com.wukong.common.exception.BusinessException;
 import com.wukong.common.model.BaseResult;
@@ -20,6 +17,9 @@ import com.wukong.provider.service.OrderService;
 import com.wukong.provider.service.UserService;
 import io.seata.spring.annotation.GlobalTransactional;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.dubbo.config.annotation.Reference;
+import org.apache.dubbo.rpc.cluster.loadbalance.RoundRobinLoadBalance;
+import org.apache.dubbo.rpc.cluster.support.FailfastCluster;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;

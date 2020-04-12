@@ -36,13 +36,23 @@
             <version>1.0</version>
         </dependency>
 
-        <!-- dubbo依赖 -->
+        <!-- 实现对 Dubbo 的自动化配置 -->
         <dependency>
-            <groupId>com.alibaba.spring.boot</groupId>
-            <artifactId>dubbo-spring-boot-starter</artifactId>
-            <version>2.0.0</version>
+            <groupId>org.apache.dubbo</groupId>
+            <artifactId>dubbo</artifactId>
+            <version>2.7.4.1</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.apache.dubbo</groupId>
+            <artifactId>dubbo-spring-boot-starter</artifactId>
+            <version>2.7.4.1</version>
+        </dependency>
+<!--        解决报错 NoClassDefFoundError: org/apache/curator/framework/CuratorFrameworkFactory-->
+        <dependency>
+            <groupId>org.apache.curator</groupId>
+            <artifactId>curator-recipes</artifactId>
+            <version>2.13.0</version>
+        </dependency>
         <!-- 引入zookeeper的依赖 -->
         <dependency>
             <groupId>com.101tec</groupId>

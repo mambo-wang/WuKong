@@ -1,13 +1,12 @@
 package com.wukong.provider;
 
-import com.alibaba.dubbo.spring.boot.annotation.EnableDubboConfiguration;
+import org.apache.dubbo.config.spring.context.annotation.EnableDubbo;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.web.servlet.ServletComponentScan;
 
 //@ServletComponentScan(basePackageClasses = {com.wukong.provider.config.filter.LoginFilter.class})
-@EnableDubboConfiguration
+@EnableDubbo
 @SpringBootApplication
 @MapperScan("com.wukong.provider.mapper")
 public class DubboProviderApplication {
