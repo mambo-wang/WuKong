@@ -1,6 +1,14 @@
 # 从零开始搭建java后端全技术栈（悟空商城-秒杀）
 ![image](https://github.com/mambo-wang/WuKong/blob/master/doc/wukong.jpg)
 ### 悟空，齐天大圣，七十二般变化，无所不能
+#### 文件目录
+- doc：项目文档
+- wukong-common：通用配置、工具类、常量类、model、统一异常处理、dubbo api
+- wukong-consumer：商品、秒杀接口、dubbo服务提供者、rmq消费者、kafka消息生产者
+- wukong-provider：订单、用户、支付接口、dubbo服务消费者、rmq生产者消费者、seata分布式事务发起者
+- wukong-scripture：mongoDB日志接口、kafka消息消费者、算法等基础技能演练场
+- wukong-west-sky：sh安装脚本、dockerfile、docker-compose配置文件
+- xxl-job-admin：xxl-job开源任务调度框架的调度中心服务
 #### 包含组件
 - dubbo + zookeeper 服务间远程调用，服务注册。
 - redis高性能缓存、分布式锁、计数器。
