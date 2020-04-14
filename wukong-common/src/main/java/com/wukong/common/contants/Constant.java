@@ -11,6 +11,7 @@ public interface Constant {
         String KEY_SALES = "wukong_sales";
 
         String KEY_USER = "wukong_user";
+        String KEY_USER_USERNAME = "wukong_user_username";
 
         String KEY_TOKEN = "wukong_token";
         /**

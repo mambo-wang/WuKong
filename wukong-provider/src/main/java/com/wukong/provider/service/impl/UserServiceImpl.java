@@ -1,6 +1,8 @@
 package com.wukong.provider.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.hash.BloomFilter;
+import com.google.common.hash.Funnels;
 import com.wukong.common.contants.Constant;
 import com.wukong.common.dubbo.DubboTestService;
 import com.wukong.common.exception.BusinessException;
@@ -23,6 +25,7 @@ import org.apache.dubbo.rpc.cluster.support.FailfastCluster;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -36,13 +39,14 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service("userService")
 @Slf4j
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService, InitializingBean {
 
     @Autowired
     private UserMapper userMapper;
@@ -56,12 +60,16 @@ public class UserServiceImpl implements UserService {
     @Reference(retries = 2, timeout = 10000, loadbalance = RoundRobinLoadBalance.NAME, cluster = FailfastCluster.NAME)
     private DubboTestService dubboTestService;
 
+    //创建一个插入对象为四百，误报率为0.4%的布隆过滤器
+    private BloomFilter<CharSequence> bloomFilter = BloomFilter.create(Funnels.stringFunnel(Charset.forName("utf-8")), 400, 0.004);
+
+
     @Override
     public List<UserVO> queryAll() {
         return userMapper.getAll().stream().map(this::convertToVO).collect(Collectors.toList());
     }
 
-    @Cacheable(value = "redis-user",key = "'user' + #id", condition = "#id>5")
+    @Cacheable(value = "redis-user",key = "'user' + #id", condition = "#id>0")
     @Override
     public UserVO findById(Long id) {
         log.info("走的数据库");
@@ -74,25 +82,46 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserVO findByUsername(String username) {
-        return convertToVO(userMapper.selectByUsername(username));
+        UserVO user = JSONObject.parseObject(String.valueOf(stringRedisTemplate.opsForHash().get(Constant.RedisKey.KEY_USER_USERNAME, username)), UserVO.class);
+        if(user != null){
+            return user;
+        } else if(bloomFilter.mightContain(username)){
+            //竞争锁
+            Boolean result = stringRedisTemplate.opsForValue().setIfAbsent("lock_username", "1", 5, TimeUnit.SECONDS);
+            if(result){
+                UserVO userVO = convertToVO(userMapper.selectByUsername(username));
+                stringRedisTemplate.opsForHash().put(Constant.RedisKey.KEY_USER_USERNAME, username, JSONObject.toJSONString(userVO));
+                return userVO;
+            }
+        }
+        throw new BusinessException("500","布隆过滤器说用户不存在，请稍后查询");
     }
 
     @Override
     public UserVO addUser(UserEditVO userEditVO) {
         User user = convertToDO(userEditVO);
         userMapper.insert(user);
+        bloomFilter.put(user.getUsername());
         return findById(user.getId());
     }
 
     @CacheEvict(value = "redis-user", key = "'user' + #userEditVO.id")
     @Override
     public void modifyUser(UserEditVO userEditVO) {
+        stringRedisTemplate.opsForHash().delete(Constant.RedisKey.KEY_USER_USERNAME, userEditVO.getUsername());
         userMapper.updateByPrimaryKey(convertToDO(userEditVO));
     }
 
     @Override
-    public void removeUser(List<Long> ids) {
-        ids.forEach(id -> userMapper.deleteByPrimaryKey(id));
+    public void removeUser(List<Long> ids) {//todo 删除缓存
+        ids.forEach(this::removeUser);
+    }
+
+    @CacheEvict(value = "redis-user", key = "'user' + #.id")
+    public void removeUser(Long id){
+        User user = userMapper.selectByPrimaryKey(id);
+        stringRedisTemplate.opsForHash().delete(Constant.RedisKey.KEY_USER_USERNAME, user.getUsername());
+        userMapper.deleteByPrimaryKey(id);
     }
 
     @Override
@@ -232,6 +261,9 @@ public class UserServiceImpl implements UserService {
     }
 
     private UserVO convertToVO(User user){
+        if(Objects.isNull(user)){
+            return null;
+        }
         UserVO userVO = new UserVO();
         BeanUtils.copyProperties(user, userVO, "password");
         log.info("convertToVO user to uservo success");
@@ -245,5 +277,11 @@ public class UserServiceImpl implements UserService {
         }
         BeanUtils.copyProperties(userEditVO, user, "score");
         return user;
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        List<User> users = userMapper.getAll();
+        users.forEach(user -> bloomFilter.put(user.getUsername()));
     }
 }

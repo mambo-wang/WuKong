@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 
+@Deprecated
 @Service(retries=2)
 @Component
 public class DubboOrderServiceImpl implements DubboOrderService {

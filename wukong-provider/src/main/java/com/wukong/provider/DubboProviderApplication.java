@@ -5,7 +5,6 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-//@ServletComponentScan(basePackageClasses = {com.wukong.provider.config.filter.LoginFilter.class})
 @EnableDubbo
 @SpringBootApplication
 @MapperScan("com.wukong.provider.mapper")
