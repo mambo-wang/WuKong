@@ -22,6 +22,8 @@ public interface Constant {
         String KEY_KILL_RESULT = "wukong_result";
 
         String KEY_RESULT_KEY = "orderId:%s";
+
+        String KEY_IDEMPOTENT = "IDEMPOTENT";
     }
 
     interface Order{

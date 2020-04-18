@@ -126,9 +126,9 @@ public class OrderServiceImpl implements OrderService {
 
             //商品售出数据统计
             if(redisTemplate.hasKey(Constant.RedisKey.KEY_SALES)){
-                redisTemplate.opsForHash().increment(Constant.RedisKey.KEY_SALES, order.getGoodsId().toString(), 1);
+                redisTemplate.opsForZSet().incrementScore(Constant.RedisKey.KEY_SALES, order.getGoodsId().toString(), 1);
             } else {
-                redisTemplate.opsForHash().put(Constant.RedisKey.KEY_SALES, order.getGoodsId().toString(), "1");
+                redisTemplate.opsForZSet().add(Constant.RedisKey.KEY_SALES, order.getGoodsId().toString(), 1);
             }
 
         } else {
