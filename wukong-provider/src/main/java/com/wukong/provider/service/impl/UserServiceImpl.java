@@ -176,8 +176,8 @@ public class UserServiceImpl implements UserService, InitializingBean {
         userMapper.updateByPrimaryKey(user);
         log.info("------after db method invoke {}", System.currentTimeMillis());
 
-        mailService.sendSimpleMail("mambo1991@163.com", "【悟空秒杀】积分增加通知","亲爱的" + user.getName() + "恭喜您下单成功，"
-                + score+"积分已到账,目前共有积分" + user.getScore()+"\n--悟空商城");
+//        mailService.sendSimpleMail("mambo1991@163.com", "【悟空秒杀】积分增加通知","亲爱的" + user.getName() + "恭喜您下单成功，"
+//                + score+"积分已到账,目前共有积分" + user.getScore()+"\n--悟空商城");
     }
 
     @Override

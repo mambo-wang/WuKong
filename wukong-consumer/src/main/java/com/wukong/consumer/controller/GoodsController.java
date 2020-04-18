@@ -1,11 +1,16 @@
 package com.wukong.consumer.controller;
 
+import com.wukong.common.contants.Constant;
 import com.wukong.common.model.BasePage;
 import com.wukong.common.model.BaseResult;
 import com.wukong.common.model.GoodsVO;
 import com.wukong.consumer.service.GoodsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Set;
 
 /**
  * @author 王宝
@@ -19,6 +24,8 @@ public class GoodsController {
     @Autowired
     private GoodsService goodsService;
 
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @GetMapping
     public BaseResult queryPageable(@RequestParam(name = "pageNo")Integer pageNo, @RequestParam(name = "pageSize")Integer pageSize){
@@ -31,6 +38,14 @@ public class GoodsController {
 
         goodsService.addGoods(goodsVO);
         return BaseResult.success(null);
+    }
 
+    @GetMapping("/top")
+    public BaseResult top(){
+        Set<ZSetOperations.TypedTuple<String>> tuples = redisTemplate.opsForZSet().reverseRangeWithScores(Constant.RedisKey.KEY_SALES, 0, 4);
+        for (ZSetOperations.TypedTuple<String> tuple : tuples) {
+            System.out.println(tuple.getValue() + " : " + tuple.getScore());
+        }
+        return BaseResult.success(tuples);
     }
 }

@@ -35,10 +35,6 @@ public class SecKillReceiver {
             log.info("---消费消息---------deliveryTag = {} ,  secKillDTO: {}",deliveryTag ,secKillDTO);
             int num = orderService.createOrder(secKillDTO);
 
-            if(Math.random() > 0.5){//todo
-                throw new Exception("xxx");
-            }
-
             if(num < 0){
                 log.error("订单创建失败");
                 //应该使用websocket告知用户失败信息
@@ -63,10 +59,14 @@ public class SecKillReceiver {
             }
 
         } catch (Exception e) {
-            log.error("添加订单失败 ， e = {}",e.toString());
             try {
+                log.error(" 订 单 创 建 失 败 {}", e.toString());
+                //应该使用websocket告知用户失败信息
+                stringRedisTemplate.opsForHash().put(Constant.RedisKey.KEY_KILL_RESULT, String.format(Constant.RedisKey.KEY_RESULT_KEY, secKillDTO.getOrderId()), Constant.SecKill.fail);
+                //加库存
+                stringRedisTemplate.opsForHash().increment(Constant.RedisKey.KEY_STOCK, secKillDTO.getGoods().getId().toString(), 1);
                 // 失败确认
-                channel.basicNack(deliveryTag, false, true);
+                channel.basicNack(deliveryTag, false, false);
             } catch (IOException e1) {
                 log.error("消息失败确认失败 ， e1 = {}", e1.toString());
             }

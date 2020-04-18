@@ -53,8 +53,8 @@ public class SecKillServiceImpl implements SecKillService {
             throw new BusinessException("500","该商品秒杀已结束");
         }
 
-        //检查是否已经买过了（秒杀场景每人限量一份商品），下单后会写入redis ，此处读取redis
-        boolean res = redisTemplate.opsForValue().setIfAbsent("miaosha:" + goodsId  + ":" +username, username, 2, TimeUnit.MINUTES);
+        //防止重复提交表单或者重复下单
+        boolean res = redisTemplate.opsForValue().setIfAbsent("miaosha:" + goodsId  + ":" +username, username, 2, TimeUnit.SECONDS);
         if(!res){
             throw new BusinessException("500","不允许重复下单");
         }

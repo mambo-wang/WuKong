@@ -33,7 +33,6 @@ import java.util.Objects;
 @Slf4j
 public class OrderServiceImpl implements OrderService {
 
-
     @Autowired
     private OrderMapper orderMapper;
 
@@ -91,7 +90,7 @@ public class OrderServiceImpl implements OrderService {
 
         Order order = orderMapper.selectByPrimaryKey(payVO.getOrderId());
         //校验订单有效性
-        if(order.getStatus() != Constant.Order.STAT_NOT_PAY){
+        if(Objects.isNull(order) || order.getStatus() != Constant.Order.STAT_NOT_PAY){
             throw new BusinessException("500", "訂單状态异常");
         }
         log.info("订单状态校验通过");
@@ -134,13 +133,11 @@ public class OrderServiceImpl implements OrderService {
 
         } else {
             log.info("支付失败");
-
             //加库存
             redisTemplate.opsForHash().increment(Constant.RedisKey.KEY_STOCK, order.getGoodsId().toString(), 1);
             //订单状态修改
             updateState(payVO.getOrderId(), Constant.Order.STAT_PAY_FAIL);
         }
-
         return convert(orderMapper.selectByPrimaryKey(payVO.getOrderId()));
     }
 
