@@ -29,12 +29,15 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -52,7 +55,14 @@ public class UserServiceImpl implements UserService, InitializingBean {
     private UserMapper userMapper;
 
     @Autowired
-    private StringRedisTemplate stringRedisTemplate;
+    private RedisTemplate redisTemplate;
+
+    @Resource(name = "redisTemplate")
+    ValueOperations<String, UserVO> opsForValue;
+
+    @Resource(name = "redisTemplate")
+    HashOperations<String, String, UserVO> opsForHash;
+
 
     @Autowired
     private MailService mailService;
@@ -82,15 +92,15 @@ public class UserServiceImpl implements UserService, InitializingBean {
 
     @Override
     public UserVO findByUsername(String username) {
-        UserVO user = JSONObject.parseObject(String.valueOf(stringRedisTemplate.opsForHash().get(Constant.RedisKey.KEY_USER_USERNAME, username)), UserVO.class);
+        UserVO user = opsForHash.get(Constant.RedisKey.KEY_USER_USERNAME, username);
         if(user != null){
             return user;
         } else if(bloomFilter.mightContain(username)){
             //竞争锁
-            Boolean result = stringRedisTemplate.opsForValue().setIfAbsent("lock_username", "1", 5, TimeUnit.SECONDS);
+            Boolean result = redisTemplate.opsForValue().setIfAbsent("lock_username", "1", 5, TimeUnit.SECONDS);
             if(result){
                 UserVO userVO = convertToVO(userMapper.selectByUsername(username));
-                stringRedisTemplate.opsForHash().put(Constant.RedisKey.KEY_USER_USERNAME, username, JSONObject.toJSONString(userVO));
+                opsForHash.put(Constant.RedisKey.KEY_USER_USERNAME, username, userVO);
                 return userVO;
             }
         }
@@ -108,7 +118,7 @@ public class UserServiceImpl implements UserService, InitializingBean {
     @CacheEvict(value = "redis-user", key = "'user' + #userEditVO.id")
     @Override
     public void modifyUser(UserEditVO userEditVO) {
-        stringRedisTemplate.opsForHash().delete(Constant.RedisKey.KEY_USER_USERNAME, userEditVO.getUsername());
+        opsForHash.delete(Constant.RedisKey.KEY_USER_USERNAME, userEditVO.getUsername());
         userMapper.updateByPrimaryKey(convertToDO(userEditVO));
     }
 
@@ -120,7 +130,7 @@ public class UserServiceImpl implements UserService, InitializingBean {
     @CacheEvict(value = "redis-user", key = "'user' + #.id")
     public void removeUser(Long id){
         User user = userMapper.selectByPrimaryKey(id);
-        stringRedisTemplate.opsForHash().delete(Constant.RedisKey.KEY_USER_USERNAME, user.getUsername());
+        opsForHash.delete(Constant.RedisKey.KEY_USER_USERNAME, user.getUsername());
         userMapper.deleteByPrimaryKey(id);
     }
 
@@ -149,7 +159,7 @@ public class UserServiceImpl implements UserService, InitializingBean {
         if(StringUtils.isEmpty(token)){
             return null ;
         }
-        UserVO user = JSONObject.parseObject(String.valueOf(stringRedisTemplate.opsForValue().get(Constant.RedisKey.KEY_TOKEN + token)), UserVO.class);
+        UserVO user = opsForValue.get(Constant.RedisKey.KEY_TOKEN + token);
         if(user!=null) {
             addCookie(response, token, user);
         }
@@ -252,7 +262,7 @@ public class UserServiceImpl implements UserService, InitializingBean {
     }
 
     private void addCookie(HttpServletResponse response, String token, UserVO user) {
-        stringRedisTemplate.opsForValue().set(Constant.RedisKey.KEY_TOKEN + token, JSONObject.toJSONString(user), 30 , TimeUnit.MINUTES);
+        opsForValue.set(Constant.RedisKey.KEY_TOKEN + token, user, 30 , TimeUnit.MINUTES);
         Cookie cookie = new Cookie("token", token);
         //设置有效期
         cookie.setMaxAge(30 * 1000 * 60);

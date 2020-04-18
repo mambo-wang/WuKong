@@ -22,7 +22,7 @@ import org.apache.dubbo.rpc.cluster.loadbalance.RoundRobinLoadBalance;
 import org.apache.dubbo.rpc.cluster.support.FailfastCluster;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -38,7 +38,7 @@ public class OrderServiceImpl implements OrderService {
     private OrderMapper orderMapper;
 
     @Autowired
-    private StringRedisTemplate stringRedisTemplate;
+    private RedisTemplate redisTemplate;
 
     @Autowired
     private UserService userService;
@@ -126,17 +126,17 @@ public class OrderServiceImpl implements OrderService {
             log.info("发送用户增加积分消息成功");
 
             //商品售出数据统计
-            if(stringRedisTemplate.hasKey(Constant.RedisKey.KEY_SALES)){
-                stringRedisTemplate.opsForHash().increment(Constant.RedisKey.KEY_SALES, order.getGoodsId().toString(), 1);
+            if(redisTemplate.hasKey(Constant.RedisKey.KEY_SALES)){
+                redisTemplate.opsForHash().increment(Constant.RedisKey.KEY_SALES, order.getGoodsId().toString(), 1);
             } else {
-                stringRedisTemplate.opsForHash().put(Constant.RedisKey.KEY_SALES, order.getGoodsId().toString(), "1");
+                redisTemplate.opsForHash().put(Constant.RedisKey.KEY_SALES, order.getGoodsId().toString(), "1");
             }
 
         } else {
             log.info("支付失败");
 
             //加库存
-            stringRedisTemplate.opsForHash().increment(Constant.RedisKey.KEY_STOCK, order.getGoodsId().toString(), 1);
+            redisTemplate.opsForHash().increment(Constant.RedisKey.KEY_STOCK, order.getGoodsId().toString(), 1);
             //订单状态修改
             updateState(payVO.getOrderId(), Constant.Order.STAT_PAY_FAIL);
         }
@@ -148,14 +148,14 @@ public class OrderServiceImpl implements OrderService {
     public OrderVO querySecKillResult(Long orderId) {
         Order order = orderMapper.selectByPrimaryKey(orderId);
         if(Objects.isNull(order)){
-            Object state = stringRedisTemplate.opsForHash().get(Constant.RedisKey.KEY_KILL_RESULT, String.format(Constant.RedisKey.KEY_RESULT_KEY, orderId));
+            Object state = redisTemplate.opsForHash().get(Constant.RedisKey.KEY_KILL_RESULT, String.format(Constant.RedisKey.KEY_RESULT_KEY, orderId));
 
             if(Objects.isNull(state)){
                 throw new BusinessException("500", "订单正在创建中，请稍后再查");
             }
             String stateDesc = String.valueOf(state);
             if(stateDesc.equals(Constant.SecKill.fail)){
-                stringRedisTemplate.opsForHash().delete(Constant.RedisKey.KEY_KILL_RESULT, String.format(Constant.RedisKey.KEY_RESULT_KEY, orderId));
+                redisTemplate.opsForHash().delete(Constant.RedisKey.KEY_KILL_RESULT, String.format(Constant.RedisKey.KEY_RESULT_KEY, orderId));
                 throw new BusinessException("500", "订单创建失败，秒杀失败");
             }
         }

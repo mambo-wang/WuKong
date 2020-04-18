@@ -9,7 +9,6 @@ import com.wukong.consumer.repository.GoodsRepository;
 import com.wukong.consumer.repository.entity.Goods;
 import com.wukong.consumer.service.GoodsService;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.shardingsphere.api.hint.HintManager;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,12 +17,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -34,7 +34,13 @@ public class GoodsServiceImpl implements GoodsService, InitializingBean {
     private GoodsRepository goodsRepository;
 
     @Autowired
-    private StringRedisTemplate redisTemplate;
+    private RedisTemplate redisTemplate;
+
+    @Resource(name = "redisTemplate")
+    private HashOperations<String, String, GoodsVO> opsForHashGoods;
+
+    @Resource(name = "redisTemplate")
+    private HashOperations<String, String, Integer> opsForHashStock;
 
     @Override
     public BasePage<GoodsVO> queryPageable(int pageNo, int pageSize) {
@@ -48,11 +54,7 @@ public class GoodsServiceImpl implements GoodsService, InitializingBean {
     @Override
     public List<GoodsVO> queryAll() {
         if(redisTemplate.hasKey(Constant.RedisKey.KEY_GOODS)){
-            HashOperations<String, String, String> hashOperations = redisTemplate.opsForHash();
-            List<String>  goodsVOS = hashOperations.values(Constant.RedisKey.KEY_GOODS);
-            if(CollectionUtils.isNotEmpty(goodsVOS)){
-                return goodsVOS.stream().map(s -> JSONObject.parseObject(s, GoodsVO.class)).collect(Collectors.toList());
-            }
+            return opsForHashGoods.values(Constant.RedisKey.KEY_GOODS);
         }
         // 强制路由主库
 //        HintManager.getInstance().setMasterRouteOnly();
@@ -72,21 +74,19 @@ public class GoodsServiceImpl implements GoodsService, InitializingBean {
     @Override
     public void addGoods(GoodsVO goodsVO) {
         Goods saved = goodsRepository.save(convert(goodsVO));
-        redisTemplate.opsForHash().put(Constant.RedisKey.KEY_GOODS, saved.getId().toString(), JSONObject.toJSONString(saved));
+        opsForHashGoods.put(Constant.RedisKey.KEY_GOODS, saved.getId().toString(), convert(saved));
     }
 
     @Override
     public void modifyGoods(GoodsVO goodsVO) {
         Goods goods = convert(goodsVO);
         Goods saved = goodsRepository.save(goods);
-        redisTemplate.opsForHash().put(Constant.RedisKey.KEY_GOODS, saved.getId().toString(), JSONObject.toJSONString(saved));
+        opsForHashGoods.put(Constant.RedisKey.KEY_GOODS, saved.getId().toString(), goodsVO);
     }
 
     @Override
     public void removeGoods(List<Long> ids) {
-        HashOperations<String, Long, GoodsVO> hashOperations = redisTemplate.opsForHash();
-        //todo
-        hashOperations.delete(Constant.RedisKey.KEY_GOODS, ids.toArray());
+        opsForHashGoods.delete(Constant.RedisKey.KEY_GOODS, ids.toArray());
         ids.forEach(id -> goodsRepository.deleteById(id));
     }
 
@@ -121,8 +121,8 @@ public class GoodsServiceImpl implements GoodsService, InitializingBean {
 
     private void addCache(List<GoodsVO> goodsVOS){
         goodsVOS.forEach(goods -> {
-            redisTemplate.opsForHash().put(Constant.RedisKey.KEY_GOODS, goods.getId().toString(), JSONObject.toJSONString(goods));
-            redisTemplate.opsForHash().put(Constant.RedisKey.KEY_STOCK, goods.getId().toString(), goods.getStock().toString());
+            opsForHashGoods.put(Constant.RedisKey.KEY_GOODS, goods.getId().toString(), goods);
+            opsForHashStock.put(Constant.RedisKey.KEY_STOCK, goods.getId().toString(), goods.getStock());
         });
         redisTemplate.expire(Constant.RedisKey.KEY_GOODS, 30, TimeUnit.MINUTES);
     }

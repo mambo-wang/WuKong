@@ -1,4 +1,4 @@
-package com.wukong.provider.config.redis;
+package com.wukong.consumer.config;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
@@ -31,57 +31,7 @@ import java.util.Set;
 @EnableCaching
 public class RedisConfig extends CachingConfigurerSupport {
 
-    /**
-     * 生成key的策略 根据类名+方法名+所有参数的值生成唯一的一个key
-     * @return
-     */
-	@Bean
-	public KeyGenerator keyGenerator() {
-        return new KeyGenerator() {
-            @Override
-            public Object generate(Object target, Method method, Object... params) {
-                StringBuilder sb = new StringBuilder();
-                sb.append(target.getClass().getName());
-                sb.append(method.getName());
-                for (Object obj : params) {
-                    sb.append(obj.toString());
-                }
-                return sb.toString();
-            }
-        };
-    }
-
-    /**
-     * 管理缓存
-     * @param redisConnectionFactory
-     * @return
-     */
-    @Bean
-    public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
-        //通过Spring提供的RedisCacheConfiguration类，构造一个自己的redis配置类，从该配置类中可以设置一些初始化的缓存命名空间
-        // 及对应的默认过期时间等属性，再利用RedisCacheManager中的builder.build()的方式生成cacheManager：
-        RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig();  // 生成一个默认配置，通过config对象即可对缓存进行自定义配置
-        config = config.entryTtl(Duration.ofMinutes(1))     // 设置缓存的默认过期时间，也是使用Duration设置
-                .disableCachingNullValues();     // 不缓存空值
-
-        // 设置一个初始化的缓存空间set集合
-        Set<String> cacheNames = new HashSet<>();
-        cacheNames.add(Constant.RedisKey.KEY_USER);
-        cacheNames.add("my-redis-cache2");
-
-        // 对每个缓存空间应用不同的配置
-        Map<String, RedisCacheConfiguration> configMap = new HashMap<>();
-        configMap.put(Constant.RedisKey.KEY_USER, config);
-        configMap.put("my-redis-cache2", config.entryTtl(Duration.ofSeconds(1200)));
-
-        RedisCacheManager cacheManager = RedisCacheManager.builder(redisConnectionFactory)     // 使用自定义的缓存配置初始化一个cacheManager
-                .initialCacheNames(cacheNames)  // 注意这两句的调用顺序，一定要先调用该方法设置初始化的缓存名，再初始化相关的配置
-                .withInitialCacheConfigurations(configMap)
-                .build();
-        return cacheManager;
-    }
-
-    @Bean
+    @Bean(name = "redisTemplate")
     public RedisTemplate<String, Object> redisTemplate(LettuceConnectionFactory connectionFactory) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
