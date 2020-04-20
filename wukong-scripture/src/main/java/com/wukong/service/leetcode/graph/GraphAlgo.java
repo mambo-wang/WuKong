@@ -7,7 +7,61 @@ public class GraphAlgo {
 
     public static void main(String[] args) {
         GraphAlgo graphAlgo = new GraphAlgo();
-        System.out.println(graphAlgo.movingCountBFS(2,3,1));
+//        System.out.println(graphAlgo.movingCountBFS(2, 3, 1));
+
+        /*****************************************200 岛屿数量***************************************/
+        char[][] grid1 = {
+                {'1', '1', '1', '1', '0'},
+                {'1', '1', '0', '1', '0'},
+                {'1', '1', '0', '0', '0'},
+                {'0', '0', '0', '0', '0'}};
+        int numIslands1 = graphAlgo.numIslands(grid1);
+        System.out.println(numIslands1);
+
+        char[][] grid2 = {
+                {'1', '1', '0', '0', '0'},
+                {'1', '1', '0', '0', '0'},
+                {'0', '0', '1', '0', '0'},
+                {'0', '0', '0', '1', '1'}};
+        int numIslands2 = graphAlgo.numIslands(grid2);
+        System.out.println(numIslands2);
+
+    }
+
+    /**
+     * leetcode 每日一题 0420 200. 岛屿数量
+     * https://www.youtube.com/channel/UC6sXxjf9HMntbtDu5SsWLAg
+     * @param grid
+     * @return
+     */
+    int a,b,result=0;
+    public int numIslands(char[][] grid) {
+        if(grid.length == 0 || grid[0].length ==0){
+            return 0;
+        }
+        a = grid.length;
+        b = grid[0].length;
+        for (int i = 0; i < a; i ++){
+            for (int j = 0; j < b; j ++){
+                if(grid[i][j] == '0'){
+                    continue;
+                }
+                dfs(grid, i, j);
+                result ++;
+            }
+        }
+        return result;
+    }
+    private void dfs(char[][] grid, int i, int j) {
+        if(i < 0 || i >= a || j < 0 || j >= b){
+            return;
+        }
+        if(grid[i][j] == '0') return;
+        grid[i][j] = '0';
+        dfs(grid, i - 1, j);
+        dfs(grid, i + 1, j);
+        dfs(grid, i, j + 1);
+        dfs(grid, i, j - 1);
     }
 
     /**
