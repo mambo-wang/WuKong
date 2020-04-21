@@ -22,7 +22,5 @@
 - jsoup + 邮件集成 + 观察者模式实现凤凰网新闻爬取、订阅、推送
 - xxl-job 分布式任务调度
 #### todo list
-- rabbitmq配置生产者发送确认和消费者手动ack
-- 配置mybatis缓存机制
 - [集成Hystrix实现服务集群容错降级](https://www.bilibili.com/video/BV1zt411M7pF?p=23)
 

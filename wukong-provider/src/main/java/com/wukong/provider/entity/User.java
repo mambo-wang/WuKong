@@ -1,8 +1,10 @@
 package com.wukong.provider.entity;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class User {
+public class User implements Serializable {
+    private static final long serialVersionUID = -8074699469981509662L;
     private Long id;
 
     private String name;

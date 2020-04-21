@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Api(value = "订单控制器")
 @RestController
 @RequestMapping("/order")
@@ -30,5 +32,11 @@ public class OrderController {
     public BaseResult result(@RequestParam(name = "orderId")Long orderId){
         OrderVO result = orderService.querySecKillResult(orderId);
         return BaseResult.success(result);
+    }
+
+    @GetMapping
+    public BaseResult queryByUserId(@RequestParam(name = "userId")Long userId){
+        List<OrderVO> orderVOS = orderService.queryOrderList(userId);
+        return BaseResult.success(orderVOS);
     }
 }

@@ -1,5 +1,6 @@
 package com.wukong.provider.mapper;
 
+import com.wukong.provider.controller.vo.OrderVO;
 import com.wukong.provider.entity.Order;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
@@ -7,6 +8,8 @@ import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.ResultMap;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
+
+import java.util.List;
 
 public interface OrderMapper {
     @Delete({
@@ -57,4 +60,6 @@ public interface OrderMapper {
         "where id = #{id,jdbcType=BIGINT}"
     })
     int updateByPrimaryKey(Order record);
+
+    List<Order> selectByUserId(Long userId);
 }

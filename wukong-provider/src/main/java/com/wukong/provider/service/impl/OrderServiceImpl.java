@@ -27,7 +27,9 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service("orderService")
 @Slf4j
@@ -157,6 +159,13 @@ public class OrderServiceImpl implements OrderService {
             }
         }
         return convert(order);
+    }
+
+    @Override
+    public List<OrderVO> queryOrderList(Long userId) {
+
+        List<Order> orders = orderMapper.selectByUserId(userId);
+        return orders.stream().map(this::convert).collect(Collectors.toList());
     }
 
     private OrderVO convert(Order order){

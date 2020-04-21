@@ -4,6 +4,8 @@ import com.wukong.common.model.SecKillDTO;
 import com.wukong.provider.controller.vo.OrderVO;
 import com.wukong.provider.controller.vo.PayVO;
 
+import java.util.List;
+
 public interface OrderService {
 
     int createOrder(SecKillDTO secKillDTO);
@@ -13,5 +15,7 @@ public interface OrderService {
     OrderVO payMoney(PayVO payVO);
 
     OrderVO querySecKillResult(Long orderId);
+
+    List<OrderVO> queryOrderList(Long userId);
 
 }

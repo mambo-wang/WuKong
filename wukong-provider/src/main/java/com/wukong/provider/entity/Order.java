@@ -1,9 +1,11 @@
 package com.wukong.provider.entity;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class Order {
+public class Order implements Serializable {
+    private static final long serialVersionUID = -8683860562943951173L;
     private Long id;
 
     private Long userId;
