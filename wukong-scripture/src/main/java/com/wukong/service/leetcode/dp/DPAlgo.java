@@ -12,7 +12,9 @@ public class DPAlgo {
         /**************************************斐波那契数列************************************************/
 //        System.out.println(algo.fib(5));
         /****************************************零钱兑换********************************************************/
-        System.out.println(algo.coinChange(new int[]{1, 2, 5}, 11));
+//        System.out.println(algo.coinChange(new int[]{1, 2, 5}, 11));
+        /*******************************************硬币************************************************************/
+        System.out.println(algo.waysToChange(10));
     }
 
     /**
@@ -94,6 +96,34 @@ public class DPAlgo {
             }
         }
         return dp[amount] == amount + 1 ? -1 : dp[amount];
+    }
+
+    /**
+     * leetCode每日一题  面试题 08.11. 硬币
+     * 硬币。给定数量不限的硬币，币值为25分、10分、5分和1分，编写代码计算n分有几种表示法。(结果可能会很大，你需要将结果模上1000000007)
+     * https://leetcode-cn.com/problems/coin-lcci/
+     * @param n
+     * @return
+     */
+    public int waysToChange(int n) {
+        int[] coins = new int[]{25,10,5,1};
+        int[][] dp = new int[5][n+1];
+        for (int i = 1; i <=4; i ++){
+            dp[i][0] = 1;
+        }
+        //动态规划方程dp[i][j] = dp[i-1][j] + dp[i][j-coins[i - 1]]
+        for(int i = 1; i <=4;i++){
+
+            for (int j = 1; j <= n; j ++ ){
+                if(j < coins[i-1]){
+                    dp[i][j] = dp[i-1][j]% 1000000007;
+                }else {
+                    dp[i][j] = (dp[i-1][j] + dp[i][j-coins[i-1]])% 1000000007;
+                }
+            }
+        }
+        return dp[4][n];
+
     }
 
 }
