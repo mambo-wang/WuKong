@@ -2,6 +2,7 @@ package com.wukong.service.controller;
 
 import com.wukong.common.model.BaseResult;
 import com.wukong.service.kafka.KafkaConsole;
+import com.wukong.service.kafka.KafkaConsumers;
 import org.apache.kafka.clients.admin.TopicDescription;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,10 +21,15 @@ public class TestController {
     @Autowired
     private KafkaConsole kafkaConsole;
 
+    @Autowired
+    private KafkaConsumers kafkaConsumers;
+
     @GetMapping("/topic")
     public BaseResult queryTopicDesc(@RequestParam(name = "topic", defaultValue = "wukong")String topic) throws ExecutionException, InterruptedException {
 
         Map<String, TopicDescription> map =  kafkaConsole.SelectTopicInfo(topic);
+
+        kafkaConsumers.seek(topic);
 
         return BaseResult.success(map);
     }
