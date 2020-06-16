@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 @RestController
 @RequestMapping("/test")
@@ -25,10 +26,12 @@ public class TestController {
     private KafkaConsumers kafkaConsumers;
 
     @GetMapping("/topic")
-    public BaseResult queryTopicDesc(@RequestParam(name = "topic", defaultValue = "wukong")String topic) throws ExecutionException, InterruptedException {
+    public BaseResult queryTopicDesc(@RequestParam(name = "topic", defaultValue = "wukong")String topic) throws ExecutionException, InterruptedException, TimeoutException {
 
         Map<String, TopicDescription> map =  kafkaConsole.SelectTopicInfo(topic);
 
+        kafkaConsole.queryOffsets();
+        kafkaConsole.getSpace();
         kafkaConsumers.seek(topic);
 
         return BaseResult.success(map);
