@@ -8,7 +8,7 @@ import com.wukong.common.utils.SnowFlake;
 import com.wukong.consumer.rabbit.hello.HelloSender;
 import com.wukong.consumer.rabbit.object.ObjectSender;
 import com.wukong.consumer.service.SecKillService;
-import io.seata.core.context.RootContext;
+import com.wukong.consumer.utils.RedisLock;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.HashOperations;
@@ -31,6 +31,9 @@ public class SecKillServiceImpl implements SecKillService {
     @Resource(name = "redisTemplate")
     private HashOperations<String, String, Integer> opsForHashStock;
 
+    @Resource
+    private RedisLock redisLock;
+
     @Autowired
     private ObjectSender objectSender;
 
@@ -46,28 +49,34 @@ public class SecKillServiceImpl implements SecKillService {
     @Override
     public Long secKill(Long goodsId, String username) {
 
-        log.info("开始全局事务，XID = {}" ,RootContext.getXID());
-
         GoodsVO goodsVO = opsForHashGoods.get(Constant.RedisKey.KEY_GOODS, goodsId.toString());
         if(goodsVO == null){
             throw new BusinessException("500","该商品秒杀已结束");
         }
 
         //防止重复提交表单或者重复下单
-        boolean res = redisTemplate.opsForValue().setIfAbsent("miaosha:" + goodsId  + ":" +username, username, 2, TimeUnit.SECONDS);
-        if(!res){
-            throw new BusinessException("500","不允许重复下单");
+//        boolean res = redisTemplate.opsForValue().setIfAbsent("miaosha:" + goodsId  + ":" +username, username, 2, TimeUnit.SECONDS);
+//        if(!res){
+//            throw new BusinessException("500","不允许重复下单");
+//        }
+
+        //预减库存，操作redis
+        log.info("预减库存中");
+        boolean result = redisLock.getLock("goods-lock:" + goodsId, 1, 50, 50);
+        if(result){
+            try {
+                long stock1 = redisTemplate.opsForHash().increment(Constant.RedisKey.KEY_STOCK, goodsId.toString(), -1);
+                if (stock1 < 0) {
+                    redisTemplate.opsForHash().increment(Constant.RedisKey.KEY_STOCK, goodsId.toString(), 1);
+                    throw new BusinessException("500", "商品已售罄");
+                }
+            } finally {
+                redisLock.releaseLock("goods-lock:" + goodsId);
+            }
+        } else {
+            throw new BusinessException("500","系统繁忙，请稍后再试");
         }
 
-        //检查是否还有库存,读取redis
-        Integer stock = opsForHashStock.get(Constant.RedisKey.KEY_STOCK, goodsId.toString());
-        log.info("库存校验中，当前剩余库存：{}", stock);
-        if(stock <= 0){
-            throw new BusinessException("500","商品已售罄");
-        }
-        //预减库存，操作redis
-        redisTemplate.opsForHash().increment(Constant.RedisKey.KEY_STOCK, goodsId.toString(), -1);
-        log.info("预减库存成功");
         //snowflake算法创建orderId
         Long orderId = snowFlake.nextId();
 
@@ -75,7 +84,7 @@ public class SecKillServiceImpl implements SecKillService {
         //创建订单、付款，修改订单状态、增加积分
         objectSender.send(secKillDTO);
         //超时未付款（检验订单状态）释放库存
-        helloSender.sendDeadLetter(secKillDTO, TimeUnit.MINUTES.toSeconds(2));
+        helloSender.sendDeadLetter(secKillDTO, TimeUnit.MINUTES.toSeconds(5));
 
         return orderId;
     }

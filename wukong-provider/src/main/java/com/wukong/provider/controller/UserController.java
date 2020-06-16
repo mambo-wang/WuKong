@@ -42,13 +42,13 @@ public class UserController {
         return BaseResult.success(userService.queryAll());
     }
 
-    @AccessLimit(seconds = 60, maxCount = 5, needLogin = false)
+    @AccessLimit(seconds = 60, maxCount = 5)
     @GetMapping("/{id}")
     public  BaseResult<UserVO> findById(@PathVariable(name = "id") Long id){
         return BaseResult.success(userService.findById(id));
     }
 
-    @AccessLimit(seconds = 60, maxCount = 5, needLogin = false)
+    @AccessLimit(seconds = 60, maxCount = 5)
     @ApiOperation(value = "根据用户名查找")
     @GetMapping("/byUsername")
     public BaseResult<UserVO> findByUsername(@ApiParam(value = "用户名") @Length(min = 1, max = 10, message = "username长度1-10")@RequestParam(name = "username") String username){

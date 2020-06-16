@@ -39,7 +39,7 @@ public class SecKillController {
      * @return 结果
      */
     @ApiOperation(value = "秒杀商品")
-    @AccessLimit(seconds = 60, maxCount = 5, needLogin = false)
+    @AccessLimit(seconds = 60, maxCount = 5)
     @GetMapping()
     public BaseResult secKill(@RequestParam(name = "goodsId")Long goodsId, @RequestParam(name = "username")String username){
         Long orderId = secKillService.secKill(goodsId, username);
