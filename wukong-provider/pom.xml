@@ -255,6 +255,23 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <executable>true</executable>
+                    <fork>true</fork>
+                    <includeSystemScope>true</includeSystemScope>
+                    <mainClass>com.wukong.provider.DubboProviderApplication</mainClass>
+                    <outputDirectory>${session.executionRootDirectory}/wukong-installer/wukong-services/wukong-provider/</outputDirectory>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.5.1</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>
             </plugin>
             <!-- mybatis generator 自动生成代码插件 -->
             <plugin>

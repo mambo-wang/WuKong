@@ -14,10 +14,15 @@
         <module>wukong-provider</module>
         <module>wukong-consumer</module>
         <module>wukong-common</module>
+        <module>xxl-job-admin</module>
     </modules>
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
