@@ -1,0 +1,63 @@
+{
+  "groups": [
+    {
+      "name": "spring.kafka.consumer",
+      "type": "com.wukong.service.kafka.KafkaConsumerProperties",
+      "sourceType": "com.wukong.service.kafka.KafkaConsumerProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "spring.kafka.consumer.auto-commit-interval",
+      "type": "java.lang.String",
+      "sourceType": "com.wukong.service.kafka.KafkaConsumerProperties"
+    },
+    {
+      "name": "spring.kafka.consumer.auto-offset-reset",
+      "type": "java.lang.String",
+      "sourceType": "com.wukong.service.kafka.KafkaConsumerProperties"
+    },
+    {
+      "name": "spring.kafka.consumer.enable-auto-commit",
+      "type": "java.lang.String",
+      "sourceType": "com.wukong.service.kafka.KafkaConsumerProperties"
+    },
+    {
+      "name": "spring.kafka.consumer.fetch-min-size",
+      "type": "java.lang.String",
+      "sourceType": "com.wukong.service.kafka.KafkaConsumerProperties"
+    },
+    {
+      "name": "spring.kafka.consumer.group-id",
+      "type": "java.lang.String",
+      "sourceType": "com.wukong.service.kafka.KafkaConsumerProperties"
+    },
+    {
+      "name": "spring.kafka.consumer.heartbeat-interval",
+      "type": "java.lang.String",
+      "sourceType": "com.wukong.service.kafka.KafkaConsumerProperties"
+    },
+    {
+      "name": "spring.kafka.consumer.key-deserializer",
+      "type": "java.lang.String",
+      "sourceType": "com.wukong.service.kafka.KafkaConsumerProperties"
+    },
+    {
+      "name": "spring.kafka.consumer.max-poll-interval",
+      "type": "java.lang.String",
+      "sourceType": "com.wukong.service.kafka.KafkaConsumerProperties"
+    },
+    {
+      "name": "spring.kafka.consumer.max-poll-records",
+      "type": "java.lang.Integer",
+      "sourceType": "com.wukong.service.kafka.KafkaConsumerProperties",
+      "defaultValue": 0
+    },
+    {
+      "name": "spring.kafka.consumer.value-deserializer",
+      "type": "java.lang.String",
+      "sourceType": "com.wukong.service.kafka.KafkaConsumerProperties"
+    }
+  ],
+  "hints": []
+}
