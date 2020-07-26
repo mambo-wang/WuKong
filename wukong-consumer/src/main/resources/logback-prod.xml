@@ -2,13 +2,7 @@
 <configuration debug="false" scan="true" scanPeriod="1 seconds">
 
     <contextName>logback</contextName>
-    <property name="log.path" value="D://workspace//WuKong//xxl-job-executor-sample-springboot.log"/>
-
-    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>%d{HH:mm:ss.SSS} %contextName [%thread] %-5level %logger{36} - %msg%n</pattern>
-        </encoder>
-    </appender>
+    <property name="log.path" value="/data/applogs/xxl-job/wukong-consumer.log"/>
 
     <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log.path}</file>
@@ -22,7 +16,6 @@
     </appender>
 
     <root level="info">
-        <appender-ref ref="console"/>
         <appender-ref ref="file"/>
     </root>
 
