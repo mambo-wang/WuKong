@@ -4,7 +4,7 @@
 
 ## 点赞趋势
 
-[![Stargazers over time](https://starchart.cc/JosephZhu1983/java-common-mistakes.svg)](https://starchart.cc/JosephZhu1983/java-common-mistakes)
+[![Stargazers over time](https://starchart.cc/mambo-wang/WuKong.svg)](https://starchart.cc/mambo-wang/WuKong)
 #### 文件目录
 - doc：项目文档
 - wukong-common：通用配置、工具类、常量类、model、统一异常处理、dubbo api
