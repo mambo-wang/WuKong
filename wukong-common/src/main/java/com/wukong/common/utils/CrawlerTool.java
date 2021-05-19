@@ -19,9 +19,24 @@ import java.util.regex.Pattern;
 
 public class CrawlerTool {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
-        System.out.println(jsoupList());
+        getImageUrl();
+    }
+
+    public static void getImageUrl() throws IOException {
+        String url = "https://open.work.weixin.qq.com/wwopen/sso/qrConnect?appid=wwa6226f74578e5c75&agentid=1000002&redirect_uri=http://8.136.196.165:8443/auth/callback/wechat_enterprise&state=3a5e95b9f9564c79ad6bb2a7aaaefb28";
+        Document document = Jsoup.connect(url).get();
+
+        Elements elements = document.getElementsByClass("qrcode lightBorder");
+
+        for (Element element:elements){
+
+            String imgUrl = element.attr("src");
+
+
+            System.out.println(imgUrl);
+        }
     }
 
     /**
