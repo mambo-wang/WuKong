@@ -1,6 +1,10 @@
 # 从零开始搭建java后端全技术栈（悟空商城-秒杀）
 ![image](https://github.com/mambo-wang/WuKong/blob/master/doc/wukong.jpg)
 ### 悟空，齐天大圣，七十二般变化，无所不能
+
+## 点赞趋势
+
+[![Stargazers over time](https://starchart.cc/mambo-wang/WuKong.svg)](https://starchart.cc/mambo-wang/WuKong)
 #### 文件目录
 - doc：项目文档
 - wukong-common：通用配置、工具类、常量类、model、统一异常处理、dubbo api
