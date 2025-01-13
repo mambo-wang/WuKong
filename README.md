@@ -12,7 +12,6 @@
 - wukong-provider：订单、用户、支付接口、dubbo服务消费者、rmq生产者消费者、seata分布式事务发起者
 - wukong-scripture：mongoDB日志接口、kafka消息消费者、算法等基础技能演练场
 - wukong-west-sky：sh安装脚本、dockerfile、docker-compose配置文件
-- xxl-job-admin：xxl-job开源任务调度框架的调度中心服务
 #### 包含组件
 - dubbo + zookeeper 服务间远程调用，服务注册。
 - redis高性能缓存、分布式锁、计数器。
@@ -24,7 +23,6 @@
 - 德鲁伊druid数据库连接池
 - 阿里巴巴seata  at/tcc分布式事务
 - jsoup + 邮件集成 + 观察者模式实现凤凰网新闻爬取、订阅、推送
-- xxl-job 分布式任务调度
 #### todo list
 - [集成Hystrix实现服务集群容错降级](https://www.bilibili.com/video/BV1zt411M7pF?p=23)
 
