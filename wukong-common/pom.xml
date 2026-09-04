@@ -15,7 +15,7 @@
     <version>1.0</version>
 
     <properties>
-        <commons-io.version>2.4</commons-io.version>
+        <commons-io.version>2.7</commons-io.version>
         <commons-lang.version>3.4</commons-lang.version>
     </properties>
 
